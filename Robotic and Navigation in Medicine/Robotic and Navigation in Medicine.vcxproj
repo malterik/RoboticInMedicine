@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Network\TcpClient.cpp" />
+    <ClCompile Include="src\Robot\UR5.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Kinematic\KinematicMatrix.h" />
@@ -20,6 +21,7 @@
     <ClInclude Include="src\Math\RotationMatrix.h" />
     <ClInclude Include="src\Math\Vector3.h" />
     <ClInclude Include="src\Network\TcpClient.h" />
+    <ClInclude Include="src\Robot\UR5.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1EFB1C1B-FC71-4BED-9277-6731FF849DD6}</ProjectGuid>
