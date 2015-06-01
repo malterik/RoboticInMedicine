@@ -7,13 +7,12 @@ int main(int argc, char* argv[])
 {
 	//set angles for the joints
 	std::array<double, 6> angles;
-	angles.assign(0);
-	
+	angles = { -90, 90, -120, -46, 90, 0 };
 	//this is the robot api
 	UR5 robot;
 
 	//connect to the robot
-	robot.connectToRobot();
+	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
 	//set the robot's joints
 	robot.setJoints(angles);
 

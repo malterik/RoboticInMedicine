@@ -7,8 +7,8 @@ UR5::UR5() :tcp_client_(new TcpClient)
 
 UR5::~UR5(){}
 
-bool UR5::connectToRobot(){
-	tcp_client_->connect(ROBOT_IP, ROBOT_PORT);
+bool UR5::connectToRobot(char* ip, int port){
+	tcp_client_->connect(ip, port);
 	tcp_client_->command("Hello Robot");
 
 	//todo return if connection is established or not
@@ -24,3 +24,11 @@ bool UR5::setJoints(std::array<double,6> &angles) {
 	return true;
 
 }
+
+std::array<double, 6> UR5::getJoints() {
+	std::array<double, 6> ret;
+
+	return ret;
+}
+
+
