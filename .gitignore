@@ -1,9 +1,5 @@
 Robotic and Navigation in Medicine.sdf
 Robotic and Navigation in Medicine.opensdf
 Robotic and Navigation in Medicine.v12.suo
-/Debug/*
-/Debug/Robotic and Navigation in Medicine.exe
-/Debug/Robotic and Navigation in Medicine.ilk
-/Debug/Robotic and Navigation in Medicine.pdb
-/Robotic and Navigation in Medicine/Debug/*
+Debug\*
 /Robotic and Navigation in Medicine/fileout_0.jpg
