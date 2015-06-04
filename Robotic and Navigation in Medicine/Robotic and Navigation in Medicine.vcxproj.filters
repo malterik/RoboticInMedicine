@@ -24,6 +24,9 @@
     <ClCompile Include="src\Robot\UR5.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="src\Ultra Sound\USHandler.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Network\TcpClient.h">
@@ -42,6 +45,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="src\Robot\UR5.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Ultra Sound\USHandler.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
