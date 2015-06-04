@@ -27,5 +27,6 @@ int main(int argc, char* argv[])
 	//KinematicMatrix k;
 	//std::cout << k.toString() << std::endl << std::endl;
 	cv::waitKey(0);
+	system("Pause");
 	return 0;
 }
