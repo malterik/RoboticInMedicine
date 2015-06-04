@@ -19,7 +19,7 @@ public:
 	std::array<double,6>& getJoints();
 
 	//todo
-	std::array<double,6> getJoints();
+	//std::array<double,6> getJoints();
 
 
 private:
