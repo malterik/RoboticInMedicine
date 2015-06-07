@@ -21,11 +21,6 @@ private:
 	vector<double> alpha;
 
 	matrix<double> A;
-
-
-
-
-
 };
 
 
