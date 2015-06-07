@@ -11,11 +11,15 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\Kinematic\directKinematics.cpp" />
+    <ClCompile Include="src\Kinematic\inverseKinematics.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Network\TcpClient.cpp" />
     <ClCompile Include="src\Robot\UR5.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Kinematic\directKinematics.h" />
+    <ClInclude Include="src\Kinematic\inverseKinematics.h" />
     <ClInclude Include="src\Kinematic\KinematicMatrix.h" />
     <ClInclude Include="src\Math\Matrix3x3.h" />
     <ClInclude Include="src\Math\RotationMatrix.h" />
@@ -59,11 +63,12 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>c:/boost/boost_1_58_0</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\Work\Robo\boost_1_58_0\boost_1_58_0</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>c:/boost/boost_1_58_0/stage/lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>D:\Work\Robo\boost_1_58_0\boost_1_58_0\stage\lib</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

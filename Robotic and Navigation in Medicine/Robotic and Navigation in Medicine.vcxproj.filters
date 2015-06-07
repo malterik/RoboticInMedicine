@@ -24,6 +24,12 @@
     <ClCompile Include="src\Robot\UR5.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="src\Kinematic\directKinematics.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Kinematic\inverseKinematics.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Network\TcpClient.h">
@@ -42,6 +48,12 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="src\Robot\UR5.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kinematic\directKinematics.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Kinematic\inverseKinematics.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
