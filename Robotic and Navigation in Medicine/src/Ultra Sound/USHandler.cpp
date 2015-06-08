@@ -57,12 +57,12 @@ std::vector<Vec2i> USHandler::processImage() {
 	Mat drawing = Mat::zeros(threshold_output.size(), CV_8UC3);
 	for (int i = 0; i< contours.size(); i++)
 	{
-		if (boundRect[i].area() < 100){
+		//if (boundRect[i].area() < 100){
 			Scalar color = Scalar(0, 0, 255);
 			drawContours(drawing, contours_poly, i, color, 1, 8, vector<Vec4i>(), 0, Point());
 			rectangle(drawing, boundRect[i].tl(), boundRect[i].br(), color, 2, 8, 0);
 			circle(drawing, center[i], (int)radius[i], color, 2, 8, 0);
-		}
+		//}
 
 	}
 
