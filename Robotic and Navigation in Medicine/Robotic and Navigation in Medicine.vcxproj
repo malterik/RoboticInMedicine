@@ -11,21 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="src\Kinematic\directKinematics.cpp" />
-    <ClCompile Include="src\Kinematic\inverseKinematics.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Network\TcpClient.cpp" />
     <ClCompile Include="src\Robot\UR5.cpp" />
+    <ClCompile Include="src\Ultra Sound\USHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Kinematic\directKinematics.h" />
-    <ClInclude Include="src\Kinematic\inverseKinematics.h" />
     <ClInclude Include="src\Kinematic\KinematicMatrix.h" />
     <ClInclude Include="src\Math\Matrix3x3.h" />
     <ClInclude Include="src\Math\RotationMatrix.h" />
     <ClInclude Include="src\Math\Vector3.h" />
     <ClInclude Include="src\Network\TcpClient.h" />
     <ClInclude Include="src\Robot\UR5.h" />
+    <ClInclude Include="src\Ultra Sound\USHandler.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{1EFB1C1B-FC71-4BED-9277-6731FF849DD6}</ProjectGuid>
@@ -63,12 +61,12 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
-      <AdditionalIncludeDirectories>D:\Work\Robo\boost_1_58_0\boost_1_58_0</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(OPENCV_DIR)\..\..\include;c:/boost/boost_1_58_0</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>D:\Work\Robo\boost_1_58_0\boost_1_58_0\stage\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(OPENCV_DIR)\lib;c:/boost/boost_1_58_0/stage/lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opencv_calib3d2411d.lib;opencv_contrib2411d.lib;opencv_core2411d.lib;opencv_features2d2411d.lib;opencv_flann2411d.lib;opencv_gpu2411d.lib;opencv_highgui2411d.lib;opencv_imgproc2411d.lib;opencv_legacy2411d.lib;opencv_ml2411d.lib;opencv_nonfree2411d.lib;opencv_objdetect2411d.lib;opencv_ocl2411d.lib;opencv_photo2411d.lib;opencv_stitching2411d.lib;opencv_superres2411d.lib;opencv_ts2411d.lib;opencv_video2411d.lib;opencv_videostab2411d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

@@ -25,10 +25,10 @@ bool UR5::setJoints(std::array<double,6> &angles) {
 
 }
 
-std::array<double, 6> UR5::getJoints() {
-	std::array<double, 6> ret;
-
-	return ret;
-}
+//std::array<double, 6> UR5::getJoints() {
+//	std::array<double, 6> ret;
+//
+//	return ret;
+//}
 
 

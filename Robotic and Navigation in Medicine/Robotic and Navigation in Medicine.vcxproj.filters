@@ -24,10 +24,7 @@
     <ClCompile Include="src\Robot\UR5.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="src\Kinematic\directKinematics.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Kinematic\inverseKinematics.cpp">
+    <ClCompile Include="src\Ultra Sound\USHandler.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -50,10 +47,7 @@
     <ClInclude Include="src\Robot\UR5.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\Kinematic\directKinematics.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Kinematic\inverseKinematics.h">
+    <ClInclude Include="src\Ultra Sound\USHandler.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
