@@ -15,15 +15,15 @@ int main(int argc, char* argv[])
 	//ush.processImage();
 
 	////set angles for the joints
-	std::array<double, 6> angles;
-	angles = { -90, 90, -120, -46, 90, 0 };
+	//std::array<double, 6> angles;
+	//angles = { -90, 90, -120, -46, 90, 0 };
 	////this is the robot api
 	UR5 robot;
 
 	////connect to the robot
 	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
 	//set the robot's joints
-	robot.setJoints(angles);
+	//robot.setJoints(angles);
 
 	std::array<double, 6> a = robot.getJoints("deg");
 

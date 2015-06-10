@@ -23,4 +23,4 @@ public:
 
 private:
 	boost::shared_ptr<TcpClient> tcp_client_;
-}
+};
