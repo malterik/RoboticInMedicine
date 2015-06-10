@@ -1,5 +1,5 @@
 #pragma once
-#include <boost\numeric\ublas\vector.hpp>
+#pragma warning(disable: 4996)
 #include <boost\numeric\ublas\matrix.hpp>
 #include <boost\numeric\ublas\io.hpp>
 
@@ -11,12 +11,12 @@ public:
 	DirectKinematics();
 	//~DirectKinematics();
 
-	matrix<double> computeDirectKinematics(vector<double> q);
+	matrix<double> computeDirectKinematics(std::array<double,6> q);
 
 private:
-	vector<double> a;
-	vector<double> d;
-	vector<double> alpha;
+	std::array<double,6> a;
+	std::array<double, 6> d;
+	std::array<double, 6> alpha;
 
 	matrix<double> A;
 };

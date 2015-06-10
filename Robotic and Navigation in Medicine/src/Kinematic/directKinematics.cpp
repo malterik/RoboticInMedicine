@@ -4,36 +4,56 @@
 
 DirectKinematics::DirectKinematics()
 {
-	a = vector<double>(6);
-	a.insert_element(0, 0);
-	a.insert_element(1, -0.4250);
-	a.insert_element(2, -0.39225);
-	a.insert_element(3, 0);
-	a.insert_element(4, 0);
-	a.insert_element(5, 0);
+	////a = vector<double>(6);
+	//a.insert_element(0, 0);
+	//a.insert_element(1, -0.4250);
+	//a.insert_element(2, -0.39225);
+	//a.insert_element(3, 0);
+	//a.insert_element(4, 0);
+	//a.insert_element(5, 0);
+	a[0] = 0;
+	a[1] = -0.4250;
+	a[2] = -0.39225;
+	a[3] = 0;
+	a[4] = 0;
+	a[5] = 0;
 	
 
-	d = vector<double>(6);
+	/*d = vector<double>(6);
 	d.insert_element(0, 0.089159);
 	d.insert_element(1, 0);
 	d.insert_element(2, 0);
 	d.insert_element(3, 0.10915);
 	d.insert_element(4, 0.09465);
 	d.insert_element(5, 0.0823);
-
-	alpha = vector<double>(6);
+*/
+	d[0] = 0.089159;
+	d[1] = 0;
+	d[2] = 0;
+	d[3] = 0.10915;
+	d[4] = 0.09465;
+	d[5] = 0.0823;
+	
+	/*alpha = vector<double>(6);
 	alpha.insert_element(0, PI/2);
 	alpha.insert_element(1, 0);
 	alpha.insert_element(2, 0);
 	alpha.insert_element(3, PI/2);
 	alpha.insert_element(4, -PI/2);
-	alpha.insert_element(5, 0);
+	alpha.insert_element(5, 0);*/
+
+	alpha[0] = PI/2;
+	alpha[1] = 0;
+	alpha[2] = 0;
+	alpha[3] = PI / 2;
+	alpha[4] = - PI / 2;
+	alpha[5] = 0;
 
 	A = matrix<double>(4, 4);
 	
 }
 
-matrix<double> DirectKinematics::computeDirectKinematics(vector<double> q)
+matrix<double> DirectKinematics::computeDirectKinematics(std::array<double,6> q)
 {
 	
 	matrix<double> T_z = matrix<double>(4, 4);
@@ -125,19 +145,19 @@ matrix<double> DirectKinematics::computeDirectKinematics(vector<double> q)
 			}
 		}
 
-		T_z(2, 3) = d(k);
+		T_z(2, 3) = d[k];
 
-		R_z(0, 0) = cos(q(k));
-		R_z(0, 1) = -sin(q(k));
-		R_z(1, 0) = sin(q(k));
-		R_z(1, 1) = cos(q(k));
+		R_z(0, 0) = cos(q[k]);
+		R_z(0, 1) = -sin(q[k]);
+		R_z(1, 0) = sin(q[k]);
+		R_z(1, 1) = cos(q[k]);
 
-		T_x(0, 3) = a(k);
+		T_x(0, 3) = a[k];
 
-		R_x(1, 1) = cos(alpha(k));
-		R_x(1, 2) = -sin(alpha(k));
-		R_x(2, 1) = sin(alpha(k));
-		R_x(2, 2) = cos(alpha(k));
+		R_x(1, 1) = cos(alpha[k]);
+		R_x(1, 2) = -sin(alpha[k]);
+		R_x(2, 1) = sin(alpha[k]);
+		R_x(2, 2) = cos(alpha[k]);
 
 		//In one expression too complex for prod()
 		matrix<double> B = prod(T_x, R_x);
