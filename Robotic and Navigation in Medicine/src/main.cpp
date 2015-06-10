@@ -24,12 +24,12 @@ int main(int argc, char* argv[])
 	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
 	//set the robot's joints
 	robot.setJoints(angles);
-	
-	std::array<double,6> a = robot.getJoints("deg");
 
-	
+	std::array<double, 6> a = robot.getJoints("deg");
+
+
 	for (unsigned int i = 0; i < a.size(); i++)
-	std::cout << a[i] << std::endl;
+		std::cout << a[i] << std::endl;
 
 	////A very small example of the kinematicMatrix class
 	//KinematicMatrix k;

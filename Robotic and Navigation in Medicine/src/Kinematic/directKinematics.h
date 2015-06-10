@@ -1,6 +1,4 @@
-#ifndef _DIRECTKINEMATICS_
-#define _DIRECTKINEMATICS_
-
+#pragma once
 #include <boost\numeric\ublas\vector.hpp>
 #include <boost\numeric\ublas\matrix.hpp>
 #include <boost\numeric\ublas\io.hpp>
@@ -21,13 +19,7 @@ private:
 	vector<double> alpha;
 
 	matrix<double> A;
-
-
-
-
-
 };
 
 
 
-#endif

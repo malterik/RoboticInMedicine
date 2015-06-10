@@ -11,6 +11,7 @@ DirectKinematics::DirectKinematics()
 	a.insert_element(3, 0);
 	a.insert_element(4, 0);
 	a.insert_element(5, 0);
+	
 
 	d = vector<double>(6);
 	d.insert_element(0, 0.089159);
