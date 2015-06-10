@@ -51,7 +51,7 @@ void TcpClient::disconnect()
 
 
 
-const std::string TcpClient::read()  {
+const char* TcpClient::read()  {
 	buffer_.assign(0);
 	for (;;) {
 		boost::system::error_code error;
@@ -79,7 +79,7 @@ void TcpClient::write(const std::string &msg) {
 
 }
 
-std::string TcpClient::command(const std::string &msg) {
+const char* TcpClient::command(const std::string &msg) {
 	write(msg);
 	return read();
 }

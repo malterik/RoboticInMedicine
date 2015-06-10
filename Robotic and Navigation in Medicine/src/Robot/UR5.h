@@ -1,6 +1,7 @@
 #pragma once
 #define _CRT_SECURE_NO_WARNINGS
 #include <boost\smart_ptr\shared_ptr.hpp>
+#include <boost\numeric\ublas\vector.hpp>
 #include "../Network/TcpClient.h"
 #include <array>
 
@@ -16,10 +17,8 @@ public:
 
 	bool connectToRobot(char* ip, int port);
 	bool setJoints(std::array<double,6> &angles);
-	std::array<double,6>& getJoints();
+	std::array<double,6>& getJoints(char* mode);
 
-	//todo
-	//std::array<double,6> getJoints();
 
 
 private:

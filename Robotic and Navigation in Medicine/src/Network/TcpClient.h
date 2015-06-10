@@ -22,10 +22,10 @@ public:
 
 	void TcpClient::update();
 	
-	std::string command(const std::string &msg);
+	const char* command(const std::string &msg);
 	
 	void write(const std::string &msg);
-	const std::string read();
+	const char* read();
 
 	bool isConnected();
 	
