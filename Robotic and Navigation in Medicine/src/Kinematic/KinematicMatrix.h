@@ -233,8 +233,8 @@ public:
     s << "x22: " << rotM.c[1].y << ", ";
     s << "x23: " << rotM.c[2].y << "\n";
     s << "x31: " << rotM.c[0].z << ", ";
-    s << "x32: " << rotM.c[0].z << ", ";
-    s << "x33: " << rotM.c[0].z << "\n";
+    s << "x32: " << rotM.c[1].z << ", ";
+    s << "x33: " << rotM.c[2].z << "\n";
     s << "Position: \n";
     s << "x: " << posV.x << ", ";
     s << "y: " << posV.y << ", ";

@@ -2,7 +2,7 @@
 #pragma warning(disable: 4996)
 #include <boost\numeric\ublas\matrix.hpp>
 #include <boost\numeric\ublas\io.hpp>
-
+#include "KinematicMatrix.h"
 using namespace boost::numeric::ublas;
 
 class DirectKinematics
@@ -11,14 +11,14 @@ public:
 	DirectKinematics();
 	//~DirectKinematics();
 
-	matrix<double> computeDirectKinematics(std::array<double,6> q);
+	KinematicMatrix computeDirectKinematics(std::array<float,6> q);
 
 private:
-	std::array<double,6> a;
-	std::array<double, 6> d;
-	std::array<double, 6> alpha;
+	std::array<float,6> a;
+	std::array<float, 6> d;
+	std::array<float, 6> alpha;
 
-	matrix<double> A;
+	matrix<float> A;
 };
 
 

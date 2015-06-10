@@ -16,8 +16,8 @@ public:
 	~UR5();
 
 	bool connectToRobot(char* ip, int port);
-	bool setJoints(std::array<double, 6> &angles);
-	std::array<double, 6>& getJoints(char* mode);
+	bool setJoints(std::array<float, 6> &angles);
+	std::array<float, 6>& getJoints(char* mode);
 
 
 

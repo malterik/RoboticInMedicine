@@ -13,7 +13,7 @@ int main(int argc, char* argv[])
 	//ush.processImage();
 
 	////set angles for the joints
-	std::array<double, 6> angles;
+	std::array<float, 6> angles;
 	angles = { -90, 90, -120, -46, 90, 0 };
 	////this is the robot api
 	UR5 robot;
@@ -23,7 +23,7 @@ int main(int argc, char* argv[])
 	//set the robot's joints
 	robot.setJoints(angles);
 
-	std::array<double, 6> a = robot.getJoints("rad");
+	std::array<float, 6> a = robot.getJoints("deg");
 
 
 	for (unsigned int i = 0; i < a.size(); i++)
@@ -31,10 +31,8 @@ int main(int argc, char* argv[])
 	DirectKinematics dk;
 
 
-	boost::numeric::ublas::matrix<double> m = dk.computeDirectKinematics(a);
-
-	std::cout << m;
-
+	KinematicMatrix k = dk.computeDirectKinematics(a);
+	std::cout << k.toString() << std::endl;
 	cv::waitKey(0);
 	system("Pause");
 	return 0;
