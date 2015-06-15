@@ -27,45 +27,19 @@
     alpha[5] = 0;
   }
 
-  //float InverseKinematics::atan2(float x, float y) {
-
-  //  if (y > 0 && a < 0) {
-  //    return atan (x / y) + 2 * PI;
-  //  }
-  //  else if (y > 0 && x >= 0) {
-  //    return atan (x / y);
-  //  }
-  //  else if (y == 0 && x > 0) {
-  //    return PI / 2;
-  //  }
-  //  else if (y == 0 && x == 0) {
-  //    return 0;
-  //  }
-  //  else if (y == 0 && x < 0) {
-  //    return 3 * PI / 2;
-  //  }
-  //  else if (y < 0 && x >= 0) {
-  //    return atan (x / y) + PI;
-  //  }
-  //  else if (y < 0 && x < 0) {
-  //    return atan (x / y) + PI;
-  //  }
-
-  //  return 0;
-  //}
 
   std::array<std::array<float, 8>, 6> InverseKinematics::computeInverseKinematics (boost::numeric::ublas::matrix<float> endPose) {
-	std::array<std::array<float, 8>, 6> configs;// = new std::array < std::array < float, 6, 8 > ;
+	std::array<std::array<float, 8>, 6> configs;
 	std::array<float, 3> x;
-	std::array<float, 3> y;// = new std::array<float, 3>();
-	std::array<float, 3> z;// = new std::array<float, 3>();
-	std::array<float, 3> handPos;// = new std::array<float, 3>();
-	std::array<float, 8> theta_1;// = new std::array<float, 2>();
-	std::array<float, 8> theta_2;// = new std::array<float, 2>();
-	std::array<float, 8> theta_3;// = new std::array<float, 2>();
-	std::array<float, 8> theta_4;// = new std::array<float, 2>();
-	std::array<float, 8> theta_5;// = new std::array<float, 2>();
-	std::array<float, 8> theta_6;// = new std::array<float, 2>();
+	std::array<float, 3> y;
+	std::array<float, 3> z;
+	std::array<float, 3> handPos;
+	std::array<float, 8> theta_1;
+	std::array<float, 8> theta_2;
+	std::array<float, 8> theta_3;
+	std::array<float, 8> theta_4;
+	std::array<float, 8> theta_5;
+	std::array<float, 8> theta_6;
 
     // Remove hand offset from position
     x [0] = endPose (0, 0);
