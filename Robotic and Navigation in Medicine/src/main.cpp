@@ -14,16 +14,16 @@ int main(int argc, char* argv[])
 
 	////set angles for the joints
 	std::array<float, 6> angles;
-	angles = { -90, 90, -120, -46, 90, 0 };
+	angles = { 0, -80, 0, -90, 0, 0 };
 	////this is the robot api
 	UR5 robot;
 
 	////connect to the robot
-	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
+	robot.connectToRobot(ROBOT_IP_LABOR, ROBOT_PORT);
 	//set the robot's joints
-	robot.setJoints(angles);
+	//robot.setJoints(angles);
 
-	std::array<float, 6> a = robot.getJoints("deg");
+	std::array<float, 6> a = robot.getJoints("rad");
 
 
 	for (unsigned int i = 0; i < a.size(); i++)

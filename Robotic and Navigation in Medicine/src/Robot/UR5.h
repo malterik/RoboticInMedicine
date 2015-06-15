@@ -6,7 +6,7 @@
 #include <array>
 
 #define ROBOT_IP_LOCAL "192.168.56.101"
-#define ROBOT_IP_LABOR "134.45.95.75"
+#define ROBOT_IP_LABOR "134.28.45.95"
 #define ROBOT_PORT 5005
 
 class UR5 {

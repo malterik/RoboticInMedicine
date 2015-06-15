@@ -49,6 +49,12 @@ DirectKinematics::DirectKinematics()
 	alpha[4] = - PI / 2;
 	alpha[5] = 0;
 
+	//alpha[0] = 0;
+	//alpha[1] = - PI/2;
+	//alpha[2] = 0;
+	//alpha[3] = -PI / 2;
+	//alpha[4] = 0;
+	//alpha[5] = 0;
 	A = matrix<float>(4, 4);
 	
 }
