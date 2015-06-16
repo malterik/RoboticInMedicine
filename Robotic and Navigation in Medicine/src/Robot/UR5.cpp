@@ -19,18 +19,18 @@ bool UR5::connectToRobot(char* ip, int port){
 	return true;
 }
 
-bool UR5::setJoints(std::array<float,6> &angles) {
+bool UR5::setJoints(JointAngles angles) {
 	char jointString[100];
 
-	sprintf(jointString, "MovePTPJoints %f %f %f %f %f %f ", angles.at(0), angles.at(1), angles.at(2), angles.at(3), angles.at(4), angles.at(5));
+	sprintf(jointString, "MovePTPJoints %f %f %f %f %f %f ", angles[0], angles[1], angles[2], angles[3], angles[4], angles[5]);
 	std::cout << tcp_client_->command(jointString) << std::endl;
 	//todo return if transmission was successfull or not
 	return true;
 
 }
 
-    std::array<float,6>& UR5::getJoints(char* mode) {
-	std::array<float, 6> ret;
+    JointAngles& UR5::getJoints(char* mode) {
+	std::array<double, 6> ret;
 	double test = 1;
 	const char* jointString;
 	jointString = tcp_client_->command("GetPositionJoints");
@@ -50,7 +50,8 @@ bool UR5::setJoints(std::array<float,6> &angles) {
 		std::cout << "False mode! Choose rad or deg" << std::endl;
 	}
 	
-	return ret;
+	JointAngles temp(ret);
+	return temp;
 	
 }
 

@@ -2,6 +2,10 @@
 #include <math.h>
 #include <boost/math/constants/constants.hpp>
 #define PI boost::math::constants::pi<float>()
+#include <boost/numeric/ublas/matrix_proxy.hpp>
+#include <boost\numeric\ublas\vector.hpp>
+#include <boost\numeric\ublas\io.hpp>
+using namespace boost::numeric::ublas;
 
 
   InverseKinematics::InverseKinematics () {
@@ -25,58 +29,58 @@
     alpha[3] = PI / 2;
     alpha[4] = - PI / 2;
     alpha[5] = 0;
+
+	ARM =	{ 1, 1, 1, 1, -1, -1, -1, -1 };
+	ELBOW = { 1, 1, -1, -1, 1, 1, -1, -1 };
+	WRIST = { 1, -1, 1, -1, 1, -1, 1, -1 };
   }
 
 
-  std::array<std::array<float, 8>, 6> InverseKinematics::computeInverseKinematics (boost::numeric::ublas::matrix<float> endPose) {
-	std::array<std::array<float, 8>, 6> configs;
-	std::array<float, 3> x;
-	std::array<float, 3> y;
-	std::array<float, 3> z;
-	std::array<float, 3> handPos;
-	std::array<float, 8> theta_1;
-	std::array<float, 8> theta_2;
-	std::array<float, 8> theta_3;
-	std::array<float, 8> theta_4;
-	std::array<float, 8> theta_5;
-	std::array<float, 8> theta_6;
+  std::array<JointAngles, 8> InverseKinematics::computeInverseKinematics (boost::numeric::ublas::matrix<double> endPose) {
+	  std::array<JointAngles, 8> configs;
 
-    // Remove hand offset from position
-    x [0] = endPose (0, 0);
-    x [1] = endPose (1, 0);
-    x [2] = endPose (2, 0);
-    y [0] = endPose (0, 1);
-    y [1] = endPose (1, 1);
-    y [2] = endPose (2, 1);
-    z [0] = endPose (0, 2);
-    z [1] = endPose (1, 2);
-    z [2] = endPose (2, 2);
+	  for (unsigned int i = 0; i < 1; i++) {
 
-    handPos [0] = endPose (0, 4) - d[5] * z [0];
-    handPos [1] = endPose (1, 4) - d[5] * z [1];
-    handPos [2] = endPose (2, 4) - d[5] * z [2];
 
-    // Calculate theta1 aiming at 2 solutions
-    theta_1 [0] = atan2 (handPos [1], handPos[0])
-        + acos (d[3] / sqrt (handPos[1] * handPos[1] + handPos[0] * handPos [0])) + PI/ 2;
-    theta_1[1] = atan2 (handPos[1], handPos[0])
-        - acos (d[3] / sqrt (handPos[1] * handPos[1] + handPos[0] * handPos[0])) + PI/ 2;
+		  /// Theta 1 
+		  std::array<double, 8> theta_1;
+		  vector<double> vec1(4);
+		  vector<double> p05(4);
+		  double psi, phi;
+		  //fill vec1 with zeros and -d6
+		  for (int i = 0; i < vec1.size(); i++) {
+			  if (i == 2) {
+				  vec1[i] = -d[5];
+			  }
+			  else if (i == 3) {
+				  vec1[i] = 1;
+			  }
+			  else {
+				  vec1[i] = 0;
+			  }
+		  }
+		  p05 = prod(endPose, vec1);
+		  psi = atan2(p05(0), p05(1));
+		  phi = /*+-*/ acos(d[3] / sqrt(pow(p05(0), 2) + pow(p05(1), 2)));
+		  theta_1[i] = phi + psi + PI / 2;
 
-    theta_5[0] = acos (
-        (endPose (0, 3) * sin (theta_1[0]) - endPose (1, 3) * cos (theta_1[1]) - d[3]) / d[5]);
-    theta_5[1] = -acos (
-        (endPose (0, 3) * sin (theta_1[0]) - endPose (1, 3) * cos (theta_1[1]) - d[3]) / d[5]);
+		  std::cout << "p05: " << p05 << std::endl;
+		  std::cout << "psi: " << psi << std::endl;
+		  std::cout << "phi: " << phi << std::endl;
+		  std::cout << "theta_" << i << ": " << theta_1[i] << std::endl;
 
-    theta_6[0] = atan2 (
-        (-y[0] * sin (theta_1[0]) + y[1] * cos (theta_1[0])) / sin (theta_5[0]),
-        -(-x[0] * sin (theta_1[0]) + x[1] * cos (theta_1[0])) / sin (theta_5[0]));
-    theta_6[1] = atan2 (
-        (-y[0] * sin (theta_1[1]) + y[1] * cos (theta_1[1])) / sin (theta_5[1]),
-        -(-x[0] * sin (theta_1[1]) + x[1] * cos (theta_1[1])) / sin (theta_5[1]));
+		  ///Theta 5
+		  std::array<double, 8> theta_5;
+		  vector<double> p06(4);
+		  vector<double> p16(4);
+		  p06 = column(endPose, 3);
 
-	configs[0] = theta_1;
-	configs[4] = theta_5;
-	configs[5] = theta_6;
+		  p16(2) = p06(0) * sin(theta_1[i]) - p06(0) * cos(theta_1[i]);
+		  theta_5[i] = /*+-*/ acos(p16(2) - d[3] / d[5]);
+
+
+	  }
+	
 	return configs;
-  }
+  }	
 

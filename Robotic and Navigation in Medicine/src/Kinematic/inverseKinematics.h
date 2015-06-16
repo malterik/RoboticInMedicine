@@ -3,15 +3,19 @@
 
 #include <array>
 #include <boost\numeric\ublas\matrix.hpp>
+#include "JointAngles.h"
 
 class InverseKinematics {
   public:
     InverseKinematics ();
-    std::array<std::array<float, 8>, 6> computeInverseKinematics (boost::numeric::ublas::matrix<float> endPose);
+    std::array<JointAngles, 8> computeInverseKinematics (boost::numeric::ublas::matrix<double> endPose);
   private:
-    std::array<float, 6> a;
-    std::array<float, 6> d;
-    std::array<float, 6> alpha;
+    std::array<double, 6> a;
+    std::array<double, 6> d;
+    std::array<double, 6> alpha;
+	std::array<signed int, 8> ARM;
+	std::array<signed int, 8> ELBOW;
+	std::array<signed int, 8> WRIST;
 
 
 };
