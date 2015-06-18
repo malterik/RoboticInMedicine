@@ -45,7 +45,7 @@ std::vector<Vec2i> USHandler::processImage() {
 	vector<Point2f>center(contours.size());
 	vector<float>radius(contours.size());
 
-	for (int i = 0; i < contours.size(); i++)
+	for (unsigned int i = 0; i < contours.size(); i++)
 	{
 		approxPolyDP(Mat(contours[i]), contours_poly[i], 3, true);
 		boundRect[i] = boundingRect(Mat(contours_poly[i]));
@@ -55,7 +55,7 @@ std::vector<Vec2i> USHandler::processImage() {
 
 	/// Draw polygonal contour + bonding rects + circles
 	Mat drawing = Mat::zeros(threshold_output.size(), CV_8UC3);
-	for (int i = 0; i< contours.size(); i++)
+	for (unsigned int i = 0; i< contours.size(); i++)
 	{
 		//if (boundRect[i].area() < 100){
 			Scalar color = Scalar(0, 0, 255);

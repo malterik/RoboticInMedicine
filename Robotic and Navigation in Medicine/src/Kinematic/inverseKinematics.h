@@ -13,7 +13,7 @@ class InverseKinematics {
     std::array<double, 6> a;
     std::array<double, 6> d;
     std::array<double, 6> alpha;
-	std::array<signed int, 8> ARM;
+	std::array<signed int, 8> SHOULDER;
 	std::array<signed int, 8> ELBOW;
 	std::array<signed int, 8> WRIST;
 

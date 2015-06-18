@@ -5,9 +5,9 @@
 JointAngles::JointAngles()
 {
 	angles_[0] = 0;
-	angles_[1] = -PI/2;
+	angles_[1] = -90;
 	angles_[2] = 0;
-	angles_[3] = -PI / 2;
+	angles_[3] = -90;
 	angles_[4] = 0;
 	angles_[5] = 0;
 }

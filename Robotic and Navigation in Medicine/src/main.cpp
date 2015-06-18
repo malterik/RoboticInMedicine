@@ -1,4 +1,4 @@
-
+#define D_SCL_SECURE_NO_WARNINGS 
 #include <iostream>
 #include "Robot\UR5.h"
 #include "Ultra Sound\USHandler.h"
@@ -19,8 +19,8 @@ int main(int argc, char* argv[])
 	//ush.processImage();
 
 	////set angles for the joints
-	std::array < double, 6 > temp = { 20,-150, -50, 28.3, 40, 0 };
-	JointAngles angles(temp);
+	std::array < double, 6 > temp = { 0,-15, -90, 34, 20, 90 };
+	JointAngles angles;
 	DirectKinematics dk;
 	InverseKinematics ik;
 	
@@ -31,7 +31,7 @@ int main(int argc, char* argv[])
 	////connect to the robot
 	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
 	//set the robot's joints
-	//robot.setJoints(angles);
+	robot.setJoints(angles);
 
 	ik.computeInverseKinematics(dk.computeDirectKinematics(robot.getJoints("rad")));
 	//std::array<float, 6> a = robot.getJoints("rad");
