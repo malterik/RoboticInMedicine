@@ -1,19 +1,35 @@
 #include "directKinematics.h"
 #include <boost/math/constants/constants.hpp>
 #define PI boost::math::constants::pi<double>()
+#include <boost\numeric\ublas\matrix.hpp>
+#include "JointAngles.h"
 
+using namespace boost::numeric::ublas;
 DirectKinematics::DirectKinematics()
 {
-
+	////a = vector<double>(6);
+	//a.insert_element(0, 0);
+	//a.insert_element(1, -0.4250);
+	//a.insert_element(2, -0.39225);
+	//a.insert_element(3, 0);
+	//a.insert_element(4, 0);
+	//a.insert_element(5, 0);
 	a[0] = 0;
 	a[1] = -0.4250;
 	a[2] = -0.39225;
 	a[3] = 0;
 	a[4] = 0;
 	a[5] = 0;
-	
 
 
+	/*d = vector<double>(6);
+	d.insert_element(0, 0.089159);
+	d.insert_element(1, 0);
+	d.insert_element(2, 0);
+	d.insert_element(3, 0.10915);
+	d.insert_element(4, 0.09465);
+	d.insert_element(5, 0.0823);
+	*/
 	d[0] = 0.089159;
 	d[1] = 0;
 	d[2] = 0;
@@ -21,20 +37,34 @@ DirectKinematics::DirectKinematics()
 	d[4] = 0.09465;
 	d[5] = 0.0823;
 
-	alpha[0] = PI/2;
+	/*alpha = vector<double>(6);
+	alpha.insert_element(0, PI/2);
+	alpha.insert_element(1, 0);
+	alpha.insert_element(2, 0);
+	alpha.insert_element(3, PI/2);
+	alpha.insert_element(4, -PI/2);
+	alpha.insert_element(5, 0);*/
+
+	alpha[0] = PI / 2;
 	alpha[1] = 0;
 	alpha[2] = 0;
 	alpha[3] = PI / 2;
-	alpha[4] = - PI / 2;
+	alpha[4] = -PI / 2;
 	alpha[5] = 0;
 
+	//alpha[0] = 0;
+	//alpha[1] = - PI/2;
+	//alpha[2] = 0;
+	//alpha[3] = -PI / 2;
+	//alpha[4] = 0;
+	//alpha[5] = 0;
 	A = matrix<double>(4, 4);
-	
+
 }
 
-boost::numeric::ublas::matrix<double> DirectKinematics::computeDirectKinematics(JointAngles q)
+matrix<double> DirectKinematics::computeDirectKinematics(JointAngles q)
 {
-	
+
 	matrix<double> T_z = matrix<double>(4, 4);
 	matrix<double> R_z = matrix<double>(4, 4);
 	matrix<double> T_x = matrix<double>(4, 4);
@@ -56,7 +86,7 @@ boost::numeric::ublas::matrix<double> DirectKinematics::computeDirectKinematics(
 		}
 	}
 
-	
+
 
 	for (int k = 0; k <= 5; k++)
 	{
@@ -146,21 +176,21 @@ boost::numeric::ublas::matrix<double> DirectKinematics::computeDirectKinematics(
 		//TODO make more performant, for example dont use all those matrices
 
 	}
-	
-	
-	Vector3<float> posV;
-	posV = Vector3<float>(A(0, 3), A(1, 3), A(2, 3));
 
-	RotationMatrix rotM(	A(0,0), A(0,1), A(0,2),
-							A(1,0), A(1,1), A(1,2),
-							A(2,0), A(2,1), A(2,2)
-						);
 
-	KinematicMatrix kinM(rotM, posV);
+	//Vector3<double> posV;
+	//posV = Vector3<double>(A(0, 3), A(1, 3), A(2, 3));
 
-	std::cout << kinM.toString() << std::endl;
+	//RotationMatrix rotM(A(0, 0), A(0, 1), A(0, 2),
+	//	A(1, 0), A(1, 1), A(1, 2),
+	//	A(2, 0), A(2, 1), A(2, 2)
+	//	);
+
+	//KinematicMatrix kinM(rotM, posV);
+
+
 	return A;
-	
+
 
 }
 
