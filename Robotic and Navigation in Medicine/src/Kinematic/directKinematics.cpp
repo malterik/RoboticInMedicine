@@ -148,7 +148,7 @@ boost::numeric::ublas::matrix<double> DirectKinematics::computeDirectKinematics(
 	}
 	
 	
-	/*Vector3<float> posV;
+	Vector3<float> posV;
 	posV = Vector3<float>(A(0, 3), A(1, 3), A(2, 3));
 
 	RotationMatrix rotM(	A(0,0), A(0,1), A(0,2),
@@ -156,9 +156,9 @@ boost::numeric::ublas::matrix<double> DirectKinematics::computeDirectKinematics(
 							A(2,0), A(2,1), A(2,2)
 						);
 
-	KinematicMatrix kinM(rotM, posV);*/
+	KinematicMatrix kinM(rotM, posV);
 
-
+	std::cout << kinM.toString() << std::endl;
 	return A;
 	
 

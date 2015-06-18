@@ -38,36 +38,50 @@ using namespace boost::numeric::ublas;
 
   std::array<JointAngles, 8> InverseKinematics::computeInverseKinematics (boost::numeric::ublas::matrix<double> endPose) {
 	  std::array<JointAngles, 8> configs;
-
-	  for (unsigned int i = 0; i < 1; i++) {
+	  std::cout << endPose << std::endl;
+	  for (unsigned int i = 0; i < 2; i++) {
 
 
 		  /// Theta 1 
 		  std::array<double, 8> theta_1;
 		  vector<double> vec1(4);
+		  vector<double> vec2(4);
 		  vector<double> p05(4);
 		  double psi, phi;
 		  //fill vec1 with zeros and -d6
 		  for (int i = 0; i < vec1.size(); i++) {
+			  
 			  if (i == 2) {
 				  vec1[i] = -d[5];
 			  }
 			  else if (i == 3) {
 				  vec1[i] = 1;
+				  vec2[i] = 1;
 			  }
 			  else {
 				  vec1[i] = 0;
+				  vec2[i] = 0;
 			  }
 		  }
-		  p05 = prod(endPose, vec1);
+		  p05 = prod(endPose, vec1) - vec2;
 		  psi = atan2(p05(0), p05(1));
-		  phi = /*+-*/ acos(d[3] / sqrt(pow(p05(0), 2) + pow(p05(1), 2)));
+		  double arg = (d[3] / sqrt(pow(p05(0), 2) + pow(p05(1), 2)));
+		  if (arg <= 1){
+			  phi = /*+-*/ pow(-1,i)* acos(arg);
+		  }
+		  else {
+			  std::cout << "warning" << std::endl;
+			  phi = 0;
+		  }
+		  
 		  theta_1[i] = phi + psi + PI / 2;
-
+		  std::cout << pow(p05(0), 2) + pow(p05(1), 2) << std::endl;
+		  std::cout << sqrt(pow(p05(0), 2) + pow(p05(1), 2)) << std::endl;
+		  std::cout << (d[3] / sqrt(pow(p05(0), 2) + pow(p05(1), 2))) << std::endl;
 		  std::cout << "p05: " << p05 << std::endl;
 		  std::cout << "psi: " << psi << std::endl;
 		  std::cout << "phi: " << phi << std::endl;
-		  std::cout << "theta_" << i << ": " << theta_1[i] << std::endl;
+		  std::cout << "theta_" << i + 1 << ": " << theta_1[i] << "  deg: " << theta_1[i]*(PI / 180) << std::endl;
 
 		  ///Theta 5
 		  std::array<double, 8> theta_5;

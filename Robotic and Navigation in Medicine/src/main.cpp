@@ -7,6 +7,9 @@
 #include "Kinematic\JointAngles.h"
 #include "Kinematic\inverseKinematics.h"
 
+#include "boost\numeric\ublas\matrix.hpp"
+#include "boost\numeric\ublas\io.hpp"
+
 int main(int argc, char* argv[])
 {
 
@@ -16,18 +19,21 @@ int main(int argc, char* argv[])
 	//ush.processImage();
 
 	////set angles for the joints
-	JointAngles angles;
+	std::array < double, 6 > temp = { 20,-150, -50, 28.3, 40, 0 };
+	JointAngles angles(temp);
 	DirectKinematics dk;
 	InverseKinematics ik;
+	
 
-	ik.computeInverseKinematics(dk.computeDirectKinematics(angles));
-	//UR5 robot;
+	
+	UR5 robot;
 
 	////connect to the robot
-	//robot.connectToRobot(ROBOT_IP_LABOR, ROBOT_PORT);
+	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
 	//set the robot's joints
-	//robot.setJoints(angles);
-
+	robot.setJoints(angles);
+	std::cout << dk.computeDirectKinematics(robot.getJoints("rad")) << std::endl;
+	//ik.computeInverseKinematics(dk.computeDirectKinematics(robot.getJoints("rad")));
 	//std::array<float, 6> a = robot.getJoints("rad");
 	
 	cv::waitKey(0);

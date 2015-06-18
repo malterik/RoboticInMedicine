@@ -49,7 +49,6 @@ bool UR5::setJoints(JointAngles angles) {
 	else {
 		std::cout << "False mode! Choose rad or deg" << std::endl;
 	}
-	
 	JointAngles temp(ret);
 	return temp;
 	
