@@ -27,7 +27,7 @@ using namespace boost::numeric::ublas;
 		  /// Theta 1 
 		  std::array<double, 8> theta_1;
 		  boost::numeric::ublas::vector<double> vec1(4);
-		  boost::numeric::ublas::vector<double> vec2(4);
+		  boost::numeric::ublas::vector<double> e4(4);
 		  boost::numeric::ublas::vector<double> p05(4);
 		  double psi, phi;
 		  //fill vec1 with zeros and -d6
@@ -38,14 +38,14 @@ using namespace boost::numeric::ublas;
 			  }
 			  else if (j == 3) {
 				  vec1[j] = 1;
-				  vec2[j] = 1;
+				  e4[j] = 1;
 			  }
 			  else {
 				  vec1[j] = 0;
-				  vec2[j] = 0;
+				  e4[j] = 0;
 			  }
 		  }
-		  p05 = prod(endPose, vec1) - vec2;
+		  p05 = prod(endPose, vec1) - e4;
 		  psi = atan2(p05(1), p05(0));
 		  double arg = (dh.d[3] / sqrt(pow(p05(0), 2) + pow(p05(1), 2)));
 		  if (arg <= 1){
@@ -73,19 +73,49 @@ using namespace boost::numeric::ublas;
 		  std::array<double, 8> theta_6;
 		  matrix<double> T61(4, 4);
 		  matrix<double> T10(4, 4);
-		  matrix<double> tempMat(4, 4);
+		  matrix<double> T16(4, 4);
 		  matrix<double> T01(4, 4);
 
 		  T01 = dh.getTransformation(1, theta_1[i]);
 		  
 		  InvertMatrix(T01, T10);
-		  tempMat = prod(T10, endPose);
-		  InvertMatrix(tempMat, T61);
+		  T16 = prod(T10, endPose);
+		  InvertMatrix(T16, T61);
 		  
 		  theta_6[i] = atan2(-(T61(1, 2) / sin(theta_5[i])), (T61(0, 2) / sin(theta_5[i]) ));
 		  std::cout << "theta_6 " << i << ": " << theta_6[i] << "\t" << "deg: " << theta_6[i] * (180 / PI) << std::endl;
 
+		  ///Theta 3
+		  std::array<double, 8> theta_3;
+		  matrix<double> T14(4, 4);
+		  matrix<double> T45(4, 4);
+		  matrix<double> T56(4, 4);
+		  matrix<double> T46(4, 4);
+		  matrix<double> T64(4, 4);
+		  vector<double> p13(4);
+		  vector<double> vec2(4);
+
+		  vec2(0) = 0;
+		  vec2(1) = -dh.d[3];
+		  vec2(2) = 0;
+		  vec2(3) = 1;
+
+		  T45 = dh.getTransformation(5, theta_5[i]);
+		  T56 = dh.getTransformation(6, theta_6[i]);
+
+		  T46 = prod(T45, T56);
+
+		  InvertMatrix(T46, T64);
+
+		  T14 = prod(T16, T64);
+
+		  p13 = prod(T14, vec2) - e4;
+
+		  std::cout << "arg acos " << /*(*//*pow(*/norm_2(p13)/*, 2)/* - pow(dh.a[1], 2) - pow(dh.a[2], 2) ) / (2 * dh.a[1] * dh.a[2])*/ << std::endl;
+		  theta_3[i] = ELBOW[i] * acos( pow(norm_2(p13), 2) - pow(dh.a[1], 2) - pow(dh.a[2], 2) / (2 * dh.a[1] * dh.a[2]) );
+		  std::cout << "theta_3 " << i << ": " << theta_3[i] << "\t" << "deg: " << theta_3[i] * (180 / PI) << std::endl;
 		  std::cout << std::endl << std::endl;
+
 
 	  }
 	

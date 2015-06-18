@@ -3,7 +3,7 @@
 #include <boost/numeric/ublas/io.hpp>
 
 using namespace boost::numeric::ublas;
-using namespace std;
+//using namespace std;
 
 /* Matrix inversion routine.
 Uses lu_factorize and lu_substitute in uBLAS to invert a matrix */
