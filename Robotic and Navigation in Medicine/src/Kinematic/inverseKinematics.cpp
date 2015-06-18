@@ -11,26 +11,6 @@ using namespace boost::numeric::ublas;
 
 
   InverseKinematics::InverseKinematics () {
-    a[0] = 0;
-    a[1] = -0.4250;
-    a[2] = -0.39225;
-    a[3] = 0;
-    a[4] = 0;
-    a[5] = 0;
-
-    d[0] = 0.089159;
-    d[1] = 0;
-    d[2] = 0;
-    d[3] = 0.10915;
-    d[4] = 0.09465;
-    d[5] = 0.0823;
-
-    alpha[0] = PI/2;
-    alpha[1] = 0;
-    alpha[2] = 0;
-    alpha[3] = PI / 2;
-    alpha[4] = - PI / 2;
-    alpha[5] = 0;
 
 	SHOULDER =	{ 1, 1, 1, 1, -1, -1, -1, -1 };
 	ELBOW = { 1, 1, -1, -1, 1, 1, -1, -1 };
@@ -54,7 +34,7 @@ using namespace boost::numeric::ublas;
 		  for (unsigned int j = 0; j < vec1.size(); j++) {
 			  
 			  if (j == 2) {
-				  vec1[j] = -d[5];
+				  vec1[j] = -dh.d[5];
 			  }
 			  else if (j == 3) {
 				  vec1[j] = 1;
@@ -67,7 +47,7 @@ using namespace boost::numeric::ublas;
 		  }
 		  p05 = prod(endPose, vec1) - vec2;
 		  psi = atan2(p05(1), p05(0));
-		  double arg = (d[3] / sqrt(pow(p05(0), 2) + pow(p05(1), 2)));
+		  double arg = (dh.d[3] / sqrt(pow(p05(0), 2) + pow(p05(1), 2)));
 		  if (arg <= 1){
 			  phi = SHOULDER[i] * acos(arg);
 		  }
@@ -85,7 +65,7 @@ using namespace boost::numeric::ublas;
 		  boost::numeric::ublas::vector<double> p16(4);
 		  p06 = column(endPose, 3);
 		  p16(2) = p06(0) * sin(theta_1[i]) - p06(1) * cos(theta_1[i]);
-		  theta_5[i] = WRIST[i] * acos((p16(2) - d[3]) / d[5]);
+		  theta_5[i] = WRIST[i] * acos((p16(2) - dh.d[3]) / dh.d[5]);
 		  std::cout << "theta_5 " << i << ": " << theta_5[i] << "\t" << "deg: " << theta_5[i] * (180 / PI) << std::endl;
 
 		  ///Theta 6
@@ -95,26 +75,8 @@ using namespace boost::numeric::ublas;
 		  matrix<double> T10(4, 4);
 		  matrix<double> tempMat(4, 4);
 		  matrix<double> T01(4, 4);
-		  
-		  T01(0,0) = cos(theta_1[i]);
-		  T01(0, 1) = 0;
-		  T01(0, 2) = sin(theta_1[i]);
-		  T01(0, 3) = alpha[0]* (180 / PI) * cos(theta_1[i]);
 
-		  T01(1, 0) = sin(theta_1[i]);
-		  T01(1, 1) = 0;
-		  T01(1, 2) = -cos(theta_1[i]);
-		  T01(1, 3) = alpha[0]* (180/PI) * sin(theta_1[i]);
-
-		  T01(2, 0) = 0;
-		  T01(2, 1) = 1;
-		  T01(2, 2) = 0;
-		  T01(2, 3) = d[0];
-
-		  T01(3, 0) = 0;
-		  T01(3, 1) = 0;
-		  T01(3, 2) = 0;
-		  T01(3, 3) = 1;
+		  T01 = dh.getTransformation(1, theta_1[i]);
 		  
 		  InvertMatrix(T01, T10);
 		  tempMat = prod(T10, endPose);

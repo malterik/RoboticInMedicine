@@ -19,8 +19,8 @@ int main(int argc, char* argv[])
 	//ush.processImage();
 
 	////set angles for the joints
-	std::array < double, 6 > temp = { 0,-15, -90, 34, 20, 90 };
-	JointAngles angles;
+	std::array < double, 6 > temp = { 50,-125, 90, -0, 220, 160 };
+	JointAngles angles(temp);
 	DirectKinematics dk;
 	InverseKinematics ik;
 	
