@@ -3,6 +3,7 @@
 #include <boost\numeric\ublas\matrix.hpp>
 #include <boost\numeric\ublas\io.hpp>
 #include "KinematicMatrix.h"
+#include "JointAngles.h"
 using namespace boost::numeric::ublas;
 
 class DirectKinematics

@@ -35,7 +35,7 @@ bool UR5::setJoints(JointAngles angles) {
 	const char* jointString;
 	jointString = tcp_client_->command("GetPositionJoints");
 	std::cout <<"string: " << jointString << std::endl;
-	sscanf(jointString, "%f %f %f %f %f %f", &ret[0], &ret[1], &ret[2], &ret[3], &ret[4], &ret[5]);
+	sscanf(jointString, "%lf %lf %lf %lf %lf %lf", &ret[0], &ret[1], &ret[2], &ret[3], &ret[4], &ret[5]);
 	
 	if (mode == "deg") {
 		//nothing to do because the values are already in degree	

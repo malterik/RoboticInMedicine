@@ -45,6 +45,17 @@ double JointAngles::getWrist3Angle() const{
 	return angles_[5];
 }
 
+std::array<double, 6> JointAngles::getArray(){
+	return angles_;
+}
+
+void JointAngles::setArray(std::array<double, 6> arr) {
+	angles_ = arr;
+}
+void JointAngles::setAngles(JointAngles angles) {
+	angles_ = angles.getArray();
+}
+
 int JointAngles::size() const{
 	return angles_.size();
 }

@@ -31,9 +31,9 @@ int main(int argc, char* argv[])
 	////connect to the robot
 	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
 	//set the robot's joints
-	robot.setJoints(angles);
-	std::cout << dk.computeDirectKinematics(robot.getJoints("rad")) << std::endl;
-	//ik.computeInverseKinematics(dk.computeDirectKinematics(robot.getJoints("rad")));
+	//robot.setJoints(angles);
+
+	ik.computeInverseKinematics(dk.computeDirectKinematics(robot.getJoints("rad")));
 	//std::array<float, 6> a = robot.getJoints("rad");
 	
 	cv::waitKey(0);
