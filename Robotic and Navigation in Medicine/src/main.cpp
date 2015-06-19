@@ -10,6 +10,8 @@
 #include "boost\numeric\ublas\matrix.hpp"
 #include "boost\numeric\ublas\io.hpp"
 
+#include <stdlib.h>
+#include <time.h>
 int main(int argc, char* argv[])
 {
 
@@ -17,9 +19,9 @@ int main(int argc, char* argv[])
 
 
 	//ush.processImage();
-
+	srand(time(NULL));
 	////set angles for the joints
-	std::array < double, 6 > temp = { 50,-125, 90, -0, 220, 160 };
+	std::array < double, 6 > temp = { rand() % 360, rand() % 360, rand() % 360, rand() % 360, rand() % 360, rand() % 360 };
 	JointAngles angles(temp);
 	DirectKinematics dk;
 	InverseKinematics ik;
@@ -31,7 +33,7 @@ int main(int argc, char* argv[])
 	////connect to the robot
 	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
 	//set the robot's joints
-	robot.setJoints(angles);
+	//robot.setJoints(angles);
 
 	ik.computeInverseKinematics(dk.computeDirectKinematics(robot.getJoints("rad")));
 	//std::array<float, 6> a = robot.getJoints("rad");
