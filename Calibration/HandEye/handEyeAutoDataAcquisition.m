@@ -73,7 +73,7 @@
     
     % acquisition loop
     acquisitionCounter = 1;
-    while (acquisitionCounter <= 50);
+    while (acquisitionCounter <= nMeasurements);
         disp(sprintf('Measurement %d', acquisitionCounter));
 
         % create random calibration pose   

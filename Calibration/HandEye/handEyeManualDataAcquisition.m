@@ -53,7 +53,6 @@
     continueAqcuisition = '';
     while (~(strcmpi(continueAqcuisition,'n')))
         
-        
         disp(sprintf('Measurement %d', acquisitionCounter));      
         
         if ((exist('robotSocket', 'var')))
