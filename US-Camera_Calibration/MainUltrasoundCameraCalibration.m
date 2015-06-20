@@ -54,7 +54,11 @@ surf(rmsDistFromMean(4)*x+meanPointsPhantom(1,4),rmsDistFromMean(4)*y+meanPoints
 
 %% Segmenting Ultrasound images
 numImages = 20;
-[c1, c2, c3, xmmPerPx, ymmPerPx, allImages] = segmentZPhantomPointsInUSImages('data\ultrasoundImagesAndPoses\fileout_', numImages);
+[cc1, cc2, cc3, xmmPerPx, ymmPerPx, allImages] = segmentZPhantomPointsInUSImages('data\ultrasoundImagesAndPoses\fileout_', numImages);
+xmmPerPx = ymmPerPx;
+c1 = cc1;
+c2 = cc2;
+c3 = cc3;
 
 % If the segmented locations are in pixels, convert them to 'mm'.
 scaleMat = diag([xmmPerPx ymmPerPx]);
@@ -66,17 +70,18 @@ c3 = (scaleMat*reshape(c3',2,[]))';
 % This is necessary for estimating the c2 (middle of the three cross-
 % sectional points of the z-wire phantom. We can call this point 'zMid') in
 % camera coordinate system.
-d_c1c2 = zeros(numImages,1);
+d_c3c2 = zeros(numImages,1);
 d_c1c3 = zeros(numImages,1);
 
 for i = 1:numImages
-    d_c1c2(i) = norm(c1(i,:)'-c2(i,:)');
+    d_c3c2(i) = norm(c3(i,:)'-c2(i,:)');
     d_c1c3(i) = norm(c1(i,:)'-c3(i,:)');
 end;
 %% Find the global coordinates of middle of the three cross-sectional 
 % points of the z-wire phanton in ultrasound images
-d = d_c1c2 ./ d_c1c3;
-zMidCamera = repmat(meanPointsPhantom(:,2)',numImages,1) + repmat(d,1,3) .* repmat(meanPointsPhantom(:,3)'-meanPointsPhantom(:,2)',numImages,1);
+d = d_c3c2 ./ d_c1c3;
+zMidCamera = repmat(meanPointsPhantom(:,2)',numImages,1) + ...
+    repmat(d,1,3) .* repmat(meanPointsPhantom(:,3)'-meanPointsPhantom(:,2)',numImages,1);
 
 %% Estimating Tranformation between image coordinate system and US Probe coordinate system.
 
