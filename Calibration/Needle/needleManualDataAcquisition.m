@@ -21,6 +21,8 @@
     % Connect to CamBarServer, if necessary
     if (~(exist('camSocket', 'var')))
         [camSocket, camInStream, camOutStream] = initCam(camIP, camPort, timeout);
+        pause(1);
+        disp('Initialized camera socket.');
     end;    
     
     % Register locator
@@ -33,7 +35,7 @@
    
     
 %% acquisition loop    
-    acquisitionCounter = 0;
+    acquisitionCounter = 1;
     continueAqcuisition = '';
     while (~(strcmpi(continueAqcuisition,'n')))
         
@@ -43,7 +45,7 @@
         [T, timestamp, isVisible, message] = getLocatorTransformMatrix(camSocket, camInStream, camOutStream, camLocator);
         
         if (isVisible)
-            camNeedleHTMs(:,:,i) = T;
+            camNeedleHTMs(:,:,acquisitionCounter) = T;
             disp(sprintf('\t%s', 'Got camera sample'));
             acquisitionCounter = acquisitionCounter + 1;
         else
@@ -54,4 +56,4 @@
     end;
 
 %% Save files
-    save(camHTMsFile, 'camHTMs');
+    save(camHTMsFile, 'camNeedleHTMs');

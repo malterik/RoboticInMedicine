@@ -33,12 +33,19 @@
     % Connect to CamBarServer, if necessary
     if (~(exist('camSocket', 'var')))
         [camSocket, camInStream, camOutStream] = initCam(camIP, camPort, timeout);
-        pause(1);
-        disp('Initialized camera socket.');
     end;    
+
+    % Connect to RobServer, if necessary
+    if (~(exist('robotSocket', 'var')))
+        [robotSocket, robotInStream, robotOutStream] = initRobot(robotIP, robotPort, timeout);
+    end;
     
     % Register locator
     message = loadLocator(camSocket, camInStream, camOutStream, camLocator);
+    disp(message);
+    
+    % Set robot speed
+    message = getAnswerFromServer(robotSocket, robotInStream, robotOutStream, sprintf('SetSpeed %d', robotSpeed));
     disp(message);
     
 %% acquire data
@@ -49,27 +56,12 @@
    
     
 %% acquisition loop    
-    acquisitionCounter = 1;
+    acquisitionCounter = 0;
     continueAqcuisition = '';
     while (~(strcmpi(continueAqcuisition,'n')))
         
-        
-        disp(sprintf('Measurement %d', acquisitionCounter));      
-        
-        if ((exist('robotSocket', 'var')))
-            deinitRobot(robotSocket, robotInStream, robotOutStream);
-            pause(0.5);
-            disp('Initialized robot socket.');
-        end;
-        
-        input('Please move robot to next position.','s');
-        
-        % Connect to RobServer, if necessary
-        if (~(exist('robotSocket', 'var')))
-            [robotSocket, robotInStream, robotOutStream] = initRobot(robotIP, robotPort, timeout);
-            pause(0.5);
-            disp('Initialized robot socket.');
-        end;
+        disp(sprintf('Measurement %d', acquisitionCounter));
+        disp('Move robot to 
 
         % get cam sample
         [T, timestamp, isVisible, message] = getLocatorTransformMatrix(camSocket, camInStream, camOutStream, camLocator);

@@ -33,24 +33,29 @@
     % Connect to CamBarServer, if necessary
     if (~(exist('camSocket', 'var')))
         [camSocket, camInStream, camOutStream] = initCam(camIP, camPort, timeout);
+        pause(1);
+        disp('Initialized camera socket.');
     end;    
 
     % Connect to RobServer, if necessary
     if (~(exist('robotSocket', 'var')))
         [robotSocket, robotInStream, robotOutStream] = initRobot(robotIP, robotPort, timeout);
+        pause(1);
+        disp('Initialized robot socket.');
     end;
     
     % Register locator
     message = loadLocator(camSocket, camInStream, camOutStream, camLocator);
-    disp(message);
+    disp(sprintf('Answer for: LoadLocator %s: %s', camLocator, message));
     
     % Set robot speed
+    cmd = sprintf('SetSpeed %d', robotSpeed);
     message = getAnswerFromServer(robotSocket, robotInStream, robotOutStream, sprintf('SetSpeed %d', robotSpeed));
-    disp(message);
+    disp(sprintf('Answer for: %s: %s', cmd, message));
     
     % Load starting position for calibration
     load(defaultJointsFile);
-    defaultHTM = directKinematics(defaultJoints*pi/180);   
+    defaultHTM = directKinematics(defaultJoints*pi/180);  
     
     
 %% reach starting position
@@ -67,8 +72,8 @@
     camHTMs = zeros(4,4, nMeasurements);
     
     % acquisition loop
-    acquisitionCounter = 0;
-    while (acquisitionCounter < 50);
+    acquisitionCounter = 1;
+    while (acquisitionCounter <= 50);
         disp(sprintf('Measurement %d', acquisitionCounter));
 
         % create random calibration pose   
@@ -84,12 +89,12 @@
         [T, timestamp, isVisible, message] = getLocatorTransformMatrix(camSocket, camInStream, camOutStream, camLocator);
         
         if (isVisible)
-            camHTMs(:,:,i) = T;
+            camHTMs(:,:,acquisitionCounter) = T;
             disp(sprintf('\t%s', 'Got camera sample'));
         
             % get robot sample       
-            robJoints(:,i) = getJointPositions(robotSocket, robotInStream, robotOutStream );
-            robHTMs(:,:,i) = getHTM(robotSocket, robotInStream, robotOutStream );
+            robJoints(:,acquisitionCounter) = getJointPositions(robotSocket, robotInStream, robotOutStream );
+            robHTMs(:,:,acquisitionCounter) = getHTM(robotSocket, robotInStream, robotOutStream );
             disp(sprintf('\t%s', 'Got robot sample'));
             acquisitionCounter = acquisitionCounter + 1;
         else
