@@ -12,18 +12,25 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\Kinematic\directKinematics.cpp" />
+    <ClCompile Include="src\Kinematic\inverseKinematics.cpp" />
+    <ClCompile Include="src\Kinematic\JointAngles.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Network\TcpClient.cpp" />
+    <ClCompile Include="src\Robot\DenavitHartenberg.cpp" />
     <ClCompile Include="src\Robot\UR5.cpp" />
     <ClCompile Include="src\Ultra Sound\USHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Kinematic\directKinematics.h" />
+    <ClInclude Include="src\Kinematic\inverseKinematics.h" />
+    <ClInclude Include="src\Kinematic\JointAngles.h" />
     <ClInclude Include="src\Kinematic\KinematicMatrix.h" />
+    <ClInclude Include="src\Math\InvertMatrix.h" />
     <ClInclude Include="src\Math\Matrix3x3.h" />
     <ClInclude Include="src\Math\RotationMatrix.h" />
     <ClInclude Include="src\Math\Vector3.h" />
     <ClInclude Include="src\Network\TcpClient.h" />
+    <ClInclude Include="src\Robot\DenavitHartenberg.h" />
     <ClInclude Include="src\Robot\UR5.h" />
     <ClInclude Include="src\Ultra Sound\USHandler.h" />
   </ItemGroup>
@@ -60,7 +67,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <SDLCheck>true</SDLCheck>
+      <SDLCheck>false</SDLCheck>
       <AdditionalUsingDirectories>
       </AdditionalUsingDirectories>
       <AdditionalIncludeDirectories>$(OPENCV_DIR)\..\..\include;c:/boost/boost_1_58_0</AdditionalIncludeDirectories>
