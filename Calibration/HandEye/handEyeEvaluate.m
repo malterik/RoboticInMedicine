@@ -2,8 +2,8 @@
 
 %% Definitions
     % Calibration settings
-    cam2MarkerFile = 'Data\Cam2Marker.mat';
-    base2EndeffectorFile = 'Data\Base2Endeffector.mat';
+    cam2MarkerFile = '..\Data\Cam2Marker.mat';
+    base2EndeffectorFile = '..\Data\Base2Endeffector.mat';
     load(cam2MarkerFile);
     load(base2EndeffectorFile);
     
@@ -37,12 +37,12 @@
         
         % calculate mean error for current number of calibrations used
         for j=1:length(MCalib);
-            all = inv(X)*inv(MCalib(:,:,j))*Y*NCalib(:,:,j);
-            [U,S,V] = svd(all);
-            Q= U*(V');
-            r = vrrotmat2vec(Q(1:3,1:3));
-            errorRotationsLocal(j) = abs(r(4)*180/pi);
-            errorTranslationsLocal(j) = norm(Q(1:3,4));
+            err = inv(X)*inv(MCalib(:,:,j))*Y*NCalib(:,:,j);
+            [U,S,V] = svd(err(1:3,1:3));
+            err = [U*V' err(1:3,4); 0 0 0 1];
+            r = vrrotmat2vec(err(1:3,1:3));
+            errorRotationsLocal(j) = abs(r(4))*180/pi;
+            errorTranslationsLocal(j) = norm(err(1:3,4));
         end
 
         errorTranslations(i) = mean(errorTranslationsLocal);
@@ -67,4 +67,3 @@
     xlabel('Number of calibration frames');
     ylabel('Absolute rotational error / °');
     hold on;
-
