@@ -10,11 +10,11 @@
 using namespace boost::numeric::ublas;
 
 
-  InverseKinematics::InverseKinematics () {
+InverseKinematics::InverseKinematics() {
 
-	SHOULDER =	{ 1, 1, 1, 1, -1, -1, -1, -1 };
-	ELBOW = { 1, 1, -1, -1, 1, 1, -1, -1 };
-	WRIST = { 1, -1, 1, -1, 1, -1, 1, -1 };
+	SHOULDER = { { 1, 1, 1, 1, -1, -1, -1, -1 } };
+	ELBOW = {{ 1, 1, -1, -1, 1, 1, -1, -1 }};
+	WRIST = { { 1, -1, 1, -1, 1, -1, 1, -1 } };
   }
 
 
@@ -49,6 +49,10 @@ using namespace boost::numeric::ublas;
 		  p05 = prod(endPose, vec1) - e4;
 		  psi = atan2(p05(1), p05(0));
 		  double arg = (dh.d[3] / sqrt(pow(p05(0), 2) + pow(p05(1), 2)));
+		  if (arg > 1 && arg < 1.01) {
+			  arg = 1;
+		  }
+		  
 		  if (arg <= 1){
 			  phi = SHOULDER[i] * acos(arg);
 		  }
@@ -112,6 +116,9 @@ using namespace boost::numeric::ublas;
 		  //std::cout << norm_2(p13) << std::endl;
 		  double arg2 = (pow(norm_2(p13), 2) - pow(dh.a[1], 2) - pow(dh.a[2], 2)) / (2 * dh.a[1] * dh.a[2]);
 		  //std::cout << "arg acos " << arg2 << std::endl;
+		  if (arg2 > 1 && arg2 < 1.01) {
+			  arg2 = 1;
+		  }
 		  theta_3[i] = ELBOW[i] * acos( arg2 );
 		  
 		  //std::cout << std::endl << std::endl;
@@ -136,7 +143,7 @@ using namespace boost::numeric::ublas;
 		  InvertMatrix(T13, T31);
 		  T34 = prod(T31, T14);
 		  
-
+		  theta_4[i] = atan2(T34(1, 0), T34(0, 0));
 		  std::cout << "theta_1 " << i << ": " << theta_1[i] << "\t" << "deg: " << theta_1[i] * (180 / PI) << std::endl;
 		  std::cout << "theta_2 " << i << ": " << theta_2[i] << "\t" << "deg: " << theta_2[i] * (180 / PI) << std::endl;
 		  std::cout << "theta_3 " << i << ": " << theta_3[i] << "\t" << "deg: " << theta_3[i] * (180 / PI) << std::endl;

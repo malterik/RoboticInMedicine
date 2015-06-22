@@ -32,12 +32,12 @@ matrix<double> DenavitHartenberg::getTransformation(int i, double theta_i){
 	transformationMatrix(0, 0) = cos(theta_i);
 	transformationMatrix(0, 1) = -cos(alpha[i-1]) * sin(theta_i);
 	transformationMatrix(0, 2) = sin(alpha[i-1]) * sin(theta_i);
-	transformationMatrix(0, 3) = alpha[i-1] /* (PI / 180) */* cos(theta_i);
+	transformationMatrix(0, 3) = a[i-1] /* (PI / 180) */* cos(theta_i);
 
 	transformationMatrix(1, 0) = sin(theta_i);
 	transformationMatrix(1, 1) = cos(alpha[i - 1]) * cos(theta_i);
 	transformationMatrix(1, 2) = -sin(alpha[i-1]) * cos(theta_i);
-	transformationMatrix(1, 3) = alpha[i-1] /* (PI / 180) */ *sin(theta_i);
+	transformationMatrix(1, 3) = a[i-1] /* (PI / 180) */ *sin(theta_i);
 
 	transformationMatrix(2, 0) = 0;
 	transformationMatrix(2, 1) = sin(alpha[i-1]);

@@ -9,9 +9,11 @@
 
 #include "boost\numeric\ublas\matrix.hpp"
 #include "boost\numeric\ublas\io.hpp"
-
 #include <stdlib.h>
 #include <time.h>
+#include <chrono>
+#include <thread>
+
 int main(int argc, char* argv[])
 {
 
@@ -33,8 +35,8 @@ int main(int argc, char* argv[])
 	////connect to the robot
 	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
 	//set the robot's joints
-	//robot.setJoints(angles);
-
+	robot.setJoints(angles);
+	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
 	ik.computeInverseKinematics(dk.computeDirectKinematics(robot.getJoints("rad")));
 	//std::array<float, 6> a = robot.getJoints("rad");
 	
