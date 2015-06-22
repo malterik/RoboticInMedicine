@@ -1,38 +1,45 @@
-
+#define D_SCL_SECURE_NO_WARNINGS 
 #include <iostream>
 #include "Robot\UR5.h"
 #include "Ultra Sound\USHandler.h"
 #include <opencv2\highgui\highgui.hpp>
 #include "Kinematic\directKinematics.h"
+#include "Kinematic\JointAngles.h"
+#include "Kinematic\inverseKinematics.h"
+
+#include "boost\numeric\ublas\matrix.hpp"
+#include "boost\numeric\ublas\io.hpp"
+#include <stdlib.h>
+#include <time.h>
+#include <chrono>
+#include <thread>
+
 int main(int argc, char* argv[])
 {
 
-	USHandler ush;
+	//USHandler ush;
 
 
 	//ush.processImage();
-
+	srand(time(NULL));
 	////set angles for the joints
-	std::array<float, 6> angles;
-	angles = { 0, -80, 0, -90, 0, 0 };
-	////this is the robot api
+	std::array < double, 6 > temp = { rand() % 360, rand() % 360, rand() % 360, rand() % 360, rand() % 360, rand() % 360 };
+	JointAngles angles(temp);
+	DirectKinematics dk;
+	InverseKinematics ik;
+	
+
+	
 	UR5 robot;
 
 	////connect to the robot
-	robot.connectToRobot(ROBOT_IP_LABOR, ROBOT_PORT);
+	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
 	//set the robot's joints
-	//robot.setJoints(angles);
-
-	std::array<float, 6> a = robot.getJoints("rad");
-
-
-	for (unsigned int i = 0; i < a.size(); i++)
-		std::cout << a[i] << std::endl;
-	DirectKinematics dk;
-
-
-	KinematicMatrix k = dk.computeDirectKinematics(a);
-	std::cout << k.toString() << std::endl;
+	robot.setJoints(angles);
+	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+	ik.computeInverseKinematics(dk.computeDirectKinematics(robot.getJoints("rad")));
+	//std::array<float, 6> a = robot.getJoints("rad");
+	
 	cv::waitKey(0);
 	system("Pause");
 	return 0;

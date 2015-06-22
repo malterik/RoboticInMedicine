@@ -1,10 +1,13 @@
 #include "directKinematics.h"
 #include <boost/math/constants/constants.hpp>
-#define PI boost::math::constants::pi<float>()
+#define PI boost::math::constants::pi<double>()
+#include <boost\numeric\ublas\matrix.hpp>
+#include "JointAngles.h"
 
+using namespace boost::numeric::ublas;
 DirectKinematics::DirectKinematics()
 {
-	////a = vector<float>(6);
+	////a = vector<double>(6);
 	//a.insert_element(0, 0);
 	//a.insert_element(1, -0.4250);
 	//a.insert_element(2, -0.39225);
@@ -17,24 +20,24 @@ DirectKinematics::DirectKinematics()
 	a[3] = 0;
 	a[4] = 0;
 	a[5] = 0;
-	
 
-	/*d = vector<float>(6);
+
+	/*d = vector<double>(6);
 	d.insert_element(0, 0.089159);
 	d.insert_element(1, 0);
 	d.insert_element(2, 0);
 	d.insert_element(3, 0.10915);
 	d.insert_element(4, 0.09465);
 	d.insert_element(5, 0.0823);
-*/
+	*/
 	d[0] = 0.089159;
 	d[1] = 0;
 	d[2] = 0;
 	d[3] = 0.10915;
 	d[4] = 0.09465;
 	d[5] = 0.0823;
-	
-	/*alpha = vector<float>(6);
+
+	/*alpha = vector<double>(6);
 	alpha.insert_element(0, PI/2);
 	alpha.insert_element(1, 0);
 	alpha.insert_element(2, 0);
@@ -42,11 +45,11 @@ DirectKinematics::DirectKinematics()
 	alpha.insert_element(4, -PI/2);
 	alpha.insert_element(5, 0);*/
 
-	alpha[0] = PI/2;
+	alpha[0] = PI / 2;
 	alpha[1] = 0;
 	alpha[2] = 0;
 	alpha[3] = PI / 2;
-	alpha[4] = - PI / 2;
+	alpha[4] = -PI / 2;
 	alpha[5] = 0;
 
 	//alpha[0] = 0;
@@ -55,17 +58,17 @@ DirectKinematics::DirectKinematics()
 	//alpha[3] = -PI / 2;
 	//alpha[4] = 0;
 	//alpha[5] = 0;
-	A = matrix<float>(4, 4);
-	
+	A = matrix<double>(4, 4);
+
 }
 
-KinematicMatrix DirectKinematics::computeDirectKinematics(std::array<float,6> q)
+matrix<double> DirectKinematics::computeDirectKinematics(JointAngles q)
 {
-	
-	matrix<float> T_z = matrix<float>(4, 4);
-	matrix<float> R_z = matrix<float>(4, 4);
-	matrix<float> T_x = matrix<float>(4, 4);
-	matrix<float> R_x = matrix<float>(4, 4);
+
+	matrix<double> T_z = matrix<double>(4, 4);
+	matrix<double> R_z = matrix<double>(4, 4);
+	matrix<double> T_x = matrix<double>(4, 4);
+	matrix<double> R_x = matrix<double>(4, 4);
 
 	//Init A
 	for (int i = 0; i <= 3; i++)
@@ -83,7 +86,7 @@ KinematicMatrix DirectKinematics::computeDirectKinematics(std::array<float,6> q)
 		}
 	}
 
-	
+
 
 	for (int k = 0; k <= 5; k++)
 	{
@@ -166,28 +169,28 @@ KinematicMatrix DirectKinematics::computeDirectKinematics(std::array<float,6> q)
 		R_x(2, 2) = cos(alpha[k]);
 
 		//In one expression too complex for prod()
-		matrix<float> B = prod(T_x, R_x);
+		matrix<double> B = prod(T_x, R_x);
 		B = prod(R_z, B);
 		B = prod(T_z, B);
 		A = prod(A, B);
 		//TODO make more performant, for example dont use all those matrices
 
 	}
-	
-	
-	Vector3<float> posV;
-	posV = Vector3<float>(A(0, 3), A(1, 3), A(2, 3));
-
-	RotationMatrix rotM(	A(0,0), A(0,1), A(0,2),
-							A(1,0), A(1,1), A(1,2),
-							A(2,0), A(2,1), A(2,2)
-						);
-
-	KinematicMatrix kinM(rotM, posV);
 
 
-	return kinM;
-	
+	//Vector3<double> posV;
+	//posV = Vector3<double>(A(0, 3), A(1, 3), A(2, 3));
+
+	//RotationMatrix rotM(A(0, 0), A(0, 1), A(0, 2),
+	//	A(1, 0), A(1, 1), A(1, 2),
+	//	A(2, 0), A(2, 1), A(2, 2)
+	//	);
+
+	//KinematicMatrix kinM(rotM, posV);
+
+
+	return A;
+
 
 }
 
