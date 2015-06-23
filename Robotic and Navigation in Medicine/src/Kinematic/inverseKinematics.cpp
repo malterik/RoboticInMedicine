@@ -20,7 +20,6 @@ InverseKinematics::InverseKinematics() {
 
   std::vector<JointAngles> InverseKinematics::computeInverseKinematics (boost::numeric::ublas::matrix<double> endPose) {
 	  std::vector<JointAngles> configs;
-	  std::cout << "endPose " << endPose << std::endl;
 	  for (unsigned int i = 0; i < 8; i++) {
 
 
@@ -149,13 +148,13 @@ InverseKinematics::InverseKinematics() {
 		  T34 = prod(T31, T14);
 		  
 		  theta_4[i] = atan2(T34(1, 0), T34(0, 0));
-		  std::cout << "theta_1 " << i << ": " << theta_1[i] << "\t" << "deg: " << theta_1[i] * (180 / PI) << std::endl;
-		  std::cout << "theta_2 " << i << ": " << theta_2[i] << "\t" << "deg: " << theta_2[i] * (180 / PI) << std::endl;
-		  std::cout << "theta_3 " << i << ": " << theta_3[i] << "\t" << "deg: " << theta_3[i] * (180 / PI) << std::endl;
-		  std::cout << "theta_4 " << i << ": " << theta_4[i] << "\t" << "deg: " << theta_4[i] * (180 / PI) << std::endl;
-		  std::cout << "theta_5 " << i << ": " << theta_5[i] << "\t" << "deg: " << theta_5[i] * (180 / PI) << std::endl;
-		  std::cout << "theta_6 " << i << ": " << theta_6[i] << "\t" << "deg: " << theta_6[i] * (180 / PI) << std::endl;
-		  std::cout << std::endl << std::endl;
+		  //std::cout << "theta_1 " << i << ": " << theta_1[i] << "\t" << "deg: " << theta_1[i] * (180 / PI) << std::endl;
+		  //std::cout << "theta_2 " << i << ": " << theta_2[i] << "\t" << "deg: " << theta_2[i] * (180 / PI) << std::endl;
+		  //std::cout << "theta_3 " << i << ": " << theta_3[i] << "\t" << "deg: " << theta_3[i] * (180 / PI) << std::endl;
+		  //std::cout << "theta_4 " << i << ": " << theta_4[i] << "\t" << "deg: " << theta_4[i] * (180 / PI) << std::endl;
+		  //std::cout << "theta_5 " << i << ": " << theta_5[i] << "\t" << "deg: " << theta_5[i] * (180 / PI) << std::endl;
+		  //std::cout << "theta_6 " << i << ": " << theta_6[i] << "\t" << "deg: " << theta_6[i] * (180 / PI) << std::endl;
+		  //std::cout << std::endl << std::endl;
 
 		  JointAngles config_i(theta_1[i], theta_2[i], theta_3[i], theta_4[i], theta_5[i], theta_6[i]);
 		  configs.push_back(config_i);

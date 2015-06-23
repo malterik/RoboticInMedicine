@@ -25,6 +25,14 @@ public:
 	void operator=(JointAngles T) {
 		angles_ = T.getArray();
 	}
+
+	double operator-(JointAngles T) {
+		double distance = 0;
+		for (int i = 0; i < 6; i++) {
+			distance += pow(angles_[i] - T.getArray()[i],2);
+		}
+		return distance;
+	}
 private:
 	std::array<double,6> angles_;
 };

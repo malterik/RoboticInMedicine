@@ -56,35 +56,19 @@ JointAngles& UR5::getJoints(char* mode) {
 	
 }
 
-void UR5::moveToPosition(std::array<double, 3> pos){
 
-	matrix<double> endPose(4,4);
-	matrix<double> currentPose(4, 4);
-	std::vector<JointAngles> endPoseJoints;
-	currentPose = direct_kinematics_.computeDirectKinematics(getJoints("rad"));
-	//Set the endpose. Keep orientation and set position
-	endPose = currentPose;
-	endPose(0, 3) = pos[0];
-	endPose(1, 3) = pos[1];
-	endPose(2, 3) = pos[2];
-	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
-	if (endPoseJoints.size() > 0) {
-		setJoints(endPoseJoints[0]); //Todo: Pathplanning
-	}
-	else{
-		std::cout << "Error: No IK Solution Found" << std::endl;
-	}
-
-
-
-}
 
 void UR5::moveToPosition(double x, double y, double z){
 
 	matrix<double> endPose(4, 4);
 	matrix<double> currentPose(4, 4);
 	std::vector<JointAngles> endPoseJoints;
-	currentPose = direct_kinematics_.computeDirectKinematics(getJoints("rad"));
+	JointAngles currentAngles;
+
+
+
+	currentAngles = getJoints("rad");
+	currentPose = direct_kinematics_.computeDirectKinematics(currentAngles);
 	//Set the endpose. Keep orientation and set position
 	endPose = currentPose;
 	endPose(0, 3) = x;
@@ -92,7 +76,7 @@ void UR5::moveToPosition(double x, double y, double z){
 	endPose(2, 3) = z;
 	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
 	if (endPoseJoints.size() > 0) {
-		setJoints(endPoseJoints[0]); //Todo: Pathplanning
+		setJoints(path_planner_.chooseNearest(currentAngles,path_planner_.checkForValidConfigurations(endPoseJoints))); 
 	}
 	else{
 		std::cout << "Error: No IK Solution Found" << std::endl;
@@ -110,8 +94,10 @@ void UR5::rotateEndEffector(double theta_x, double theta_y, double theta_z) {
 	matrix<double> endPose(4, 4);
 	matrix<double> currentPose(4, 4);
 	std::vector<JointAngles> endPoseJoints;
+	JointAngles currentAngles;
 
-	currentPose = direct_kinematics_.computeDirectKinematics(getJoints("rad"));
+	currentAngles = getJoints("rad");
+	currentPose = direct_kinematics_.computeDirectKinematics(currentAngles);
 	//fill rotX
 	rotX(0, 0) = 1;
 	rotX(0, 1) = 0;
@@ -168,7 +154,10 @@ void UR5::rotateEndEffector(double theta_x, double theta_y, double theta_z) {
 	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
 
 	if (endPoseJoints.size() > 0) {
-		setJoints(endPoseJoints[0]);
+		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)));
+	}
+	else{
+		std::cout << "Error: No IK Solution Found" << std::endl;
 	}
 
 	
@@ -178,8 +167,9 @@ void UR5::moveAlongVector(double x, double y, double z) {
 	matrix<double> currentPose(4, 4);
 	matrix<double> endPose(4, 4);
 	std::vector<JointAngles> endPoseJoints;
-
-	currentPose = direct_kinematics_.computeDirectKinematics(getJoints("rad"));
+	JointAngles currentAngles;
+	currentAngles = getJoints("rad");
+	currentPose = direct_kinematics_.computeDirectKinematics(currentAngles);
 
 	endPose = currentPose;
 	endPose(0, 3) += x;
@@ -189,7 +179,10 @@ void UR5::moveAlongVector(double x, double y, double z) {
 	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
 
 	if (endPoseJoints.size() > 0) {
-		setJoints(endPoseJoints[0]);
+		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)));
+	}
+	else{
+		std::cout << "Error: No IK Solution Found" << std::endl;
 	}
 }
 
@@ -199,6 +192,101 @@ void UR5::moveToHomePosition(){
 	setJoints(homePos);
 }
 
+void UR5::waitUntilFinished(){
+	const char *respString;
+	tcp_client_->write("GetQueueLength");
+}
 
+void UR5::moveToPose(double x, double y, double z, double theta_x, double theta_y, double theta_z) {
+	matrix<double> rotX(3, 3);
+	matrix<double> rotY(3, 3);
+	matrix<double> rotZ(3, 3);
 
+	matrix<double> endOrientation(3, 3);
+	matrix<double> endPose(4, 4);
+	matrix<double> currentPose(4, 4);
+	std::vector<JointAngles> endPoseJoints;
+	JointAngles currentAngles;
+
+	currentAngles = getJoints("rad");
+	currentPose = direct_kinematics_.computeDirectKinematics(currentAngles);
+	endPose = currentPose;
+
+	//fill rotX
+	rotX(0, 0) = 1;
+	rotX(0, 1) = 0;
+	rotX(0, 2) = 0;
+
+	rotX(1, 0) = 0;
+	rotX(1, 1) = cos(theta_x);
+	rotX(1, 2) = -sin(theta_x);
+
+	rotX(2, 0) = 0;
+	rotX(2, 1) = sin(theta_x);
+	rotX(2, 2) = cos(theta_x);
+
+	//fill rotY
+	rotY(0, 0) = cos(theta_y);
+	rotY(0, 1) = 0;
+	rotY(0, 2) = sin(theta_y);
+
+	rotY(1, 0) = 0;
+	rotY(1, 1) = 1;
+	rotY(1, 2) = 0;
+
+	rotY(2, 0) = -sin(theta_y);
+	rotY(2, 1) = 0;
+	rotY(2, 2) = cos(theta_y);
+
+	//fill rotZ
+	rotZ(0, 0) = cos(theta_z);
+	rotZ(0, 1) = -sin(theta_z);
+	rotZ(0, 2) = 0;
+
+	rotZ(1, 0) = sin(theta_z);
+	rotZ(1, 1) = cos(theta_z);
+	rotZ(1, 2) = 0;
+
+	rotZ(2, 0) = 0;
+	rotZ(2, 1) = 0;
+	rotZ(2, 2) = 1;
+
+	matrix<double> temp(3, 3);
+	temp = prod(rotY, rotZ);
+	endOrientation = prod(rotX, temp);
+
+	
+	//put the orientation matrix into the endPose
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			endPose(i, j) = endOrientation(i, j);
+		}
+	}
+
+	endPose(0, 3) = x;
+	endPose(1, 3) = y;
+	endPose(2, 3) = z;
+
+	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
+	if (endPoseJoints.size() > 0) {
+		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)));
+	}
+	else{
+		std::cout << "Error: No IK Solution Found" << std::endl;
+	}
+}
+
+void UR5::moveToPose(matrix<double> endPose) {
+	std::vector<JointAngles> endPoseJoints;
+	JointAngles currentAngles;
+
+	currentAngles = getJoints("rad");
+	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
+	if (endPoseJoints.size() > 0) {
+		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)));
+	}
+	else{
+		std::cout << "Error: No IK Solution Found" << std::endl;
+	}
+}
 

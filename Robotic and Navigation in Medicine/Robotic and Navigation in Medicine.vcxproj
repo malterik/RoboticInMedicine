@@ -14,6 +14,7 @@
     <ClCompile Include="src\Kinematic\directKinematics.cpp" />
     <ClCompile Include="src\Kinematic\inverseKinematics.cpp" />
     <ClCompile Include="src\Kinematic\JointAngles.cpp" />
+    <ClCompile Include="src\Kinematic\PathPlanner.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Network\TcpClient.cpp" />
     <ClCompile Include="src\Robot\DenavitHartenberg.cpp" />
@@ -25,6 +26,7 @@
     <ClInclude Include="src\Kinematic\inverseKinematics.h" />
     <ClInclude Include="src\Kinematic\JointAngles.h" />
     <ClInclude Include="src\Kinematic\KinematicMatrix.h" />
+    <ClInclude Include="src\Kinematic\PathPlanner.h" />
     <ClInclude Include="src\Math\InvertMatrix.h" />
     <ClInclude Include="src\Math\Matrix3x3.h" />
     <ClInclude Include="src\Math\RotationMatrix.h" />
