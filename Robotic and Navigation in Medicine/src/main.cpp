@@ -14,6 +14,9 @@
 #include <chrono>
 #include <thread>
 
+#include <boost\math\constants\constants.hpp>
+#define PI boost::math::constants::pi<double>()
+
 int main(int argc, char* argv[])
 {
 
@@ -29,25 +32,6 @@ int main(int argc, char* argv[])
 	InverseKinematics ik;
 	matrix<double> pos(4, 4);
 
-	pos(0, 0) = 1;
-	pos(0, 1) = 0;
-	pos(0, 2) = 0;
-	pos(0, 3) = 0.2;
-
-	pos(1, 0) = 0;
-	pos(1, 1) = 1;
-	pos(1, 2) = 0;
-	pos(1, 3) = 0.28;
-
-	pos(2, 0) = 0;
-	pos(2, 1) = 0;
-	pos(2, 2) = 1;
-	pos(2, 3) = 0;
-
-	pos(3, 0) = 0;
-	pos(3, 1) = 0;
-	pos(3, 2) = 0;
-	pos(3, 3) = 1;
 	UR5 robot;
 
 	////connect to the robot
@@ -55,10 +39,21 @@ int main(int argc, char* argv[])
 	//set the robot's joints
 	
 	//std::this_thread::sleep_for(std::chrono::milliseconds(10000));
-	angles = ik.computeInverseKinematics(pos);
-	robot.setJoints(angles[0]);
-	robot.getJoints("rad");
+	//angles = ik.computeInverseKinematics(pos);
+	//robot.setJoints(angles[0]);
+	//robot.getJoints("rad");
 	//std::array<float, 6> a = robot.getJoints("rad");
+	//robot.moveToHomePosition();
+	//std::this_thread::sleep_for(std::chrono::milliseconds(15000));
+	robot.moveToPosition(0.5, 0.0,0.3);
+	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+	robot.rotateEndEffector(0, PI/2, 0);
+	std::this_thread::sleep_for(std::chrono::milliseconds(15000));
+	for (double y = 0; y < 0.2; y += 0.005){
+		robot.moveAlongVector(0.005, 0, 0);
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
+	}
+	robot.moveToHomePosition();
 	
 	cv::waitKey(0);
 	system("Pause");

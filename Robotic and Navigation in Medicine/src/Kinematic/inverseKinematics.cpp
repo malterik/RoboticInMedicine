@@ -12,16 +12,16 @@ using namespace boost::numeric::ublas;
 
 InverseKinematics::InverseKinematics() {
 
-	SHOULDER = { { 1, 1, 1, 1, -1, -1, -1, -1 } };
-	ELBOW = {{ 1, 1, -1, -1, 1, 1, -1, -1 }};
-	WRIST = { { 1, -1, 1, -1, 1, -1, 1, -1 } };
+	SHOULDER =	{{ 1, 1, 1, 1, -1, -1, -1, -1 }};
+	ELBOW =		{{ 1, 1, -1, -1, 1, 1, -1, -1 }};
+	WRIST =		{{ 1, -1, 1, -1, 1, -1, 1, -1 }};
   }
 
 
-  std::array<JointAngles, 8> InverseKinematics::computeInverseKinematics (boost::numeric::ublas::matrix<double> endPose) {
-	  std::array<JointAngles, 8> configs;
+  std::vector<JointAngles> InverseKinematics::computeInverseKinematics (boost::numeric::ublas::matrix<double> endPose) {
+	  std::vector<JointAngles> configs;
 	  std::cout << "endPose " << endPose << std::endl;
-	  for (unsigned int i = 0; i < configs.size(); i++) {
+	  for (unsigned int i = 0; i < 8; i++) {
 
 
 		  /// Theta 1 
@@ -49,17 +49,16 @@ InverseKinematics::InverseKinematics() {
 		  p05 = prod(endPose, vec1) - e4;
 		  psi = atan2(p05(1), p05(0));
 		  double arg = (dh.d[3] / sqrt(pow(p05(0), 2) + pow(p05(1), 2)));
-		  if (arg > 1 && arg < 1.01) {
+		  if (arg > 1 && arg <= 1.01) {
 			  arg = 1;
 		  }
-		  
-		  if (arg <= 1){
-			  phi = SHOULDER[i] * acos(arg);
+		  else if (arg < -1 && arg >= -1.01) {
+			  arg = -1;
 		  }
-		  else {
-			  std::cout << "warning" << std::endl;
-			  phi = 0;
+		  else if(arg > 1.01 || arg < -1.01) {
+			 // continue;
 		  }
+		  phi = SHOULDER[i] * acos(arg);
 		  
 		  theta_1[i] = phi + psi + PI / 2;
 		 
@@ -119,6 +118,12 @@ InverseKinematics::InverseKinematics() {
 		  if (arg2 > 1 && arg2 < 1.01) {
 			  arg2 = 1;
 		  }
+		  else if (arg2 < -1 && arg2 > -1.01) {
+			  arg2 = -1;
+		  }
+		  else if (arg2 > 1.01 || arg2 < -1.01) {
+			 // continue;
+		  }
 		  theta_3[i] = ELBOW[i] * acos( arg2 );
 		  
 		  //std::cout << std::endl << std::endl;
@@ -153,7 +158,7 @@ InverseKinematics::InverseKinematics() {
 		  std::cout << std::endl << std::endl;
 
 		  JointAngles config_i(theta_1[i], theta_2[i], theta_3[i], theta_4[i], theta_5[i], theta_6[i]);
-		  configs[i] = config_i;
+		  configs.push_back(config_i);
 }
 	
 	return configs;
