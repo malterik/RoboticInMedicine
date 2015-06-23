@@ -24,6 +24,7 @@ bool UR5::setJoints(JointAngles angles) {
 
 	sprintf(jointString, "MovePTPJoints %f %f %f %f %f %f ", angles[0], angles[1], angles[2], angles[3], angles[4], angles[5]);
 	std::cout << tcp_client_->command(jointString) << std::endl;
+	std::cout << jointString << std::endl;
 	//todo return if transmission was successfull or not
 	return true;
 

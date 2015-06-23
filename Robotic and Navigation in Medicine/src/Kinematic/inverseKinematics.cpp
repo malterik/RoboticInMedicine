@@ -151,6 +151,9 @@ InverseKinematics::InverseKinematics() {
 		  std::cout << "theta_5 " << i << ": " << theta_5[i] << "\t" << "deg: " << theta_5[i] * (180 / PI) << std::endl;
 		  std::cout << "theta_6 " << i << ": " << theta_6[i] << "\t" << "deg: " << theta_6[i] * (180 / PI) << std::endl;
 		  std::cout << std::endl << std::endl;
+
+		  JointAngles config_i(theta_1[i], theta_2[i], theta_3[i], theta_4[i], theta_5[i], theta_6[i]);
+		  configs[i] = config_i;
 }
 	
 	return configs;

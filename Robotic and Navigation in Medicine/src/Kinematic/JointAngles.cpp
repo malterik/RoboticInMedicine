@@ -15,7 +15,15 @@ JointAngles::JointAngles()
 JointAngles::JointAngles(std::array<double, 6> angles) {
 	angles_ = angles;
 }
+JointAngles::JointAngles(double theta_1, double theta_2, double theta_3, double theta_4, double theta_5, double theta_6) {
+	angles_[0] = theta_1;
+	angles_[1] = theta_2;
+	angles_[2] = theta_3;
+	angles_[3] = theta_4;
+	angles_[4] = theta_5;
+	angles_[5] = theta_6;
 
+}
 
 JointAngles::~JointAngles()
 {
