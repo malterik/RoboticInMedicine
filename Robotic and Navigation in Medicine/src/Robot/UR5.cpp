@@ -197,6 +197,13 @@ void UR5::waitUntilFinished(){
 	tcp_client_->write("GetQueueLength");
 }
 
+void UR5::setSpeed(double speedValue) {
+	char jointString[100];
+
+	sprintf(jointString, "SetSpeed %lf ",speedValue);
+	std::cout << tcp_client_->command(jointString) << std::endl;
+}
+
 void UR5::moveToPose(double x, double y, double z, double theta_x, double theta_y, double theta_z) {
 	matrix<double> rotX(3, 3);
 	matrix<double> rotY(3, 3);

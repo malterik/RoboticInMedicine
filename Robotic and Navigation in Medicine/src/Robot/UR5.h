@@ -35,6 +35,8 @@ public:
 
 	void moveAlongVector(double x, double y, double z);
 	void orientateAlongVector(double x, double y, double z);
+
+	void setSpeed(double speedValue);
 	void moveToHomePosition();
 	void waitUntilFinished();
 

@@ -12,19 +12,23 @@ using namespace boost::numeric::ublas;
 
 InverseKinematics::InverseKinematics() {
 
-	SHOULDER =	{{ 1, 1, 1, 1, -1, -1, -1, -1 }};
-	ELBOW =		{{ 1, 1, -1, -1, 1, 1, -1, -1 }};
-	WRIST =		{{ 1, -1, 1, -1, 1, -1, 1, -1 }};
+	//SHOULDER =	{{ 1, 1, 1, 1, -1, -1, -1, -1 }};
+	//ELBOW =		{{ 1, 1, -1, -1, 1, 1, -1, -1 }};
+	//WRIST =		{{ 1, -1, 1, -1, 1, -1, 1, -1 }};
+
+	SHOULDER =	{{  1,  1, -1, -1 }};
+	ELBOW =		{{ -1, -1, -1, -1 }};
+	WRIST =		{{  1, -1,  1, -1 }};
   }
 
 
   std::vector<JointAngles> InverseKinematics::computeInverseKinematics (boost::numeric::ublas::matrix<double> endPose) {
 	  std::vector<JointAngles> configs;
-	  for (unsigned int i = 0; i < 8; i++) {
+	  for (unsigned int i = 0; i < NUMBER_OF_SOLUTIONS; i++) {
 
 
 		  /// Theta 1 
-		  std::array<double, 8> theta_1;
+		  std::array<double, NUMBER_OF_SOLUTIONS> theta_1;
 		  boost::numeric::ublas::vector<double> vec1(4);
 		  boost::numeric::ublas::vector<double> e4(4);
 		  boost::numeric::ublas::vector<double> p05(4);
@@ -63,7 +67,7 @@ InverseKinematics::InverseKinematics() {
 		 
 
 		  ///Theta 5
-		  std::array<double, 8> theta_5;
+		  std::array<double, NUMBER_OF_SOLUTIONS> theta_5;
 		  boost::numeric::ublas::vector<double> p06(4);
 		  boost::numeric::ublas::vector<double> p16(4);
 		  p06 = column(endPose, 3);
@@ -73,7 +77,7 @@ InverseKinematics::InverseKinematics() {
 
 		  ///Theta 6
 		  //Transformation matrix from frame 0 to 1
-		  std::array<double, 8> theta_6;
+		  std::array<double, NUMBER_OF_SOLUTIONS> theta_6;
 		  matrix<double> T61(4, 4);
 		  matrix<double> T10(4, 4);
 		  matrix<double> T16(4, 4);
@@ -89,7 +93,7 @@ InverseKinematics::InverseKinematics() {
 		  
 
 		  ///Theta 3
-		  std::array<double, 8> theta_3;
+		  std::array<double, NUMBER_OF_SOLUTIONS> theta_3;
 		  matrix<double> T14(4, 4);
 		  matrix<double> T45(4, 4);
 		  matrix<double> T56(4, 4);
@@ -128,12 +132,12 @@ InverseKinematics::InverseKinematics() {
 		  //std::cout << std::endl << std::endl;
 
 		  ///Theta 2
-		  std::array<double, 8> theta_2;
+		  std::array<double, NUMBER_OF_SOLUTIONS> theta_2;
 		  theta_2[i] = -atan2(p13(1), -p13(0)) + asin((dh.a[2] * sin(theta_3[i])) / norm_2(p13) );
 		  
 
 		  ///Theta 4 
-		  std::array<double, 8> theta_4;
+		  std::array<double, NUMBER_OF_SOLUTIONS> theta_4;
 		  matrix<double> T13(4, 4);
 		  matrix<double> T31(4, 4);
 		  matrix<double> T12(4, 4);
