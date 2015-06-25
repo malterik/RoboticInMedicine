@@ -1,7 +1,7 @@
 #pragma once
 
-#include "../Kinematic/KinematicMatrix.h"
 #include <string>
+#include "boost\numeric\ublas\matrix.hpp"
 
 /// <summary>
 /// Provides methods to import calibration data.
@@ -9,15 +9,13 @@
 /// <remarks>
 ///	Calibration data can be imported to transform between different coordinate systems (i.e ultra sound, needle, camera, robot).
 /// </remarks>
-class CalibrationReader
+class CSVParser
 {
 public:
-	CalibrationReader(std::string fileName);
-	~CalibrationReader();
+	CSVParser();
+	~CSVParser();
 
-	KinematicMatrix importFromCSVFile();
-
-private:
-	std::string fileName_; ///< The filename that contains the calibration data.
+	boost::numeric::ublas::matrix<double> readHTM(std::string fileName);
+	boost::numeric::ublas::vector<double> CSVParser::readVector3D(std::string fileName);
 };
 
