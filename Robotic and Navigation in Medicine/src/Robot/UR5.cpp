@@ -338,13 +338,12 @@ boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::u
 }
 
 boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose, bool use_orthogonalization)
-{
-	boost::numeric::ublas::matrix<double> transformationMatrix(4, 4);
-	
+{	
 	if (use_orthogonalization)
 	{
-		// orthonormalize pose
-		
+		// orthonormalize pose	
+		boost::numeric::ublas::matrix<double> transformationMatrix(4, 4);
+
 		alglib::real_1d_array w;
 		alglib::real_2d_array u;
 		alglib::real_2d_array vt;
@@ -395,16 +394,17 @@ boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::u
 			rot(1, 0), rot(1, 1), rot(1, 2), pose(1, 3),
 			rot(2, 0), rot(2, 1), rot(2, 2), pose(2, 3),
 			0, 0, 0, 1;
+
+		return transformationMatrix;
 	}
 
 	else
 	{
 		// take transformation matrix as is	
 
-		transformationMatrix = robot_to_cam_transformation_;
-	}
+		return prod(robot_to_cam_transformation_, camPose);
+	}	
 	
-	return prod(transformationMatrix, camPose);
 }
 
 void UR5::setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation)
