@@ -15,7 +15,7 @@ public:
 	CSVParser();
 	~CSVParser();
 
-	boost::numeric::ublas::matrix<double> readHTM(std::string fileName);
+	boost::numeric::ublas::matrix<double> CSVParser::readHTM(std::string fileName);
 	boost::numeric::ublas::vector<double> CSVParser::readVector3D(std::string fileName);
 };
 

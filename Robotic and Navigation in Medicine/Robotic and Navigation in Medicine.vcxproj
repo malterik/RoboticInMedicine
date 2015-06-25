@@ -19,7 +19,7 @@
     <ClCompile Include="src\Network\TcpClient.cpp" />
     <ClCompile Include="src\Robot\DenavitHartenberg.cpp" />
     <ClCompile Include="src\Robot\UR5.cpp" />
-    <ClCompile Include="src\Tools\CalibrationReader.cpp" />
+    <ClCompile Include="src\Tools\CSVParser.cpp" />
     <ClCompile Include="src\Ultra Sound\USHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -35,7 +35,7 @@
     <ClInclude Include="src\Network\TcpClient.h" />
     <ClInclude Include="src\Robot\DenavitHartenberg.h" />
     <ClInclude Include="src\Robot\UR5.h" />
-    <ClInclude Include="src\Tools\CalibrationReader.hpp" />
+    <ClInclude Include="src\Tools\CSVParser.hpp" />
     <ClInclude Include="src\Ultra Sound\USHandler.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
