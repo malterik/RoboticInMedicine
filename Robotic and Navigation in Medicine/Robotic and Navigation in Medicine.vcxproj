@@ -11,6 +11,19 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\alglibinternal.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\alglibmisc.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\ap.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\dataanalysis.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\diffequations.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\fasttransforms.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\integration.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\interpolation.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\linalg.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\optimization.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\solvers.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\specialfunctions.cpp" />
+    <ClCompile Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\statistics.cpp" />
     <ClCompile Include="src\Kinematic\directKinematics.cpp" />
     <ClCompile Include="src\Kinematic\inverseKinematics.cpp" />
     <ClCompile Include="src\Kinematic\JointAngles.cpp" />
@@ -23,6 +36,20 @@
     <ClCompile Include="src\Ultra Sound\USHandler.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\alglibinternal.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\alglibmisc.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\ap.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\dataanalysis.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\diffequations.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\fasttransforms.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\integration.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\interpolation.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\linalg.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\optimization.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\solvers.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\specialfunctions.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\statistics.h" />
+    <ClInclude Include="..\..\..\Downloads\alglib-3.9.0.cpp.gpl\cpp\src\stdafx.h" />
     <ClInclude Include="src\Kinematic\directKinematics.h" />
     <ClInclude Include="src\Kinematic\inverseKinematics.h" />
     <ClInclude Include="src\Kinematic\JointAngles.h" />

@@ -8,6 +8,9 @@
 #include "../Kinematic/inverseKinematics.h"
 #include "../Kinematic/directKinematics.h"
 #include "../Kinematic/PathPlanner.h"
+#include "../ALGLIB/linalg.h"
+#include "boost/numeric/ublas/matrix.hpp"
+#include "boost/numeric/ublas/assignment.hpp"
 
 #define ROBOT_IP_LOCAL "192.168.56.101"
 #define ROBOT_IP_LABOR "134.28.45.95"
@@ -18,6 +21,9 @@ class UR5 {
 public:
 	UR5();
 	~UR5();
+
+
+	void setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation);
 
 	bool connectToRobot(char* ip, int port);
 	bool setJoints(JointAngles angles);
@@ -47,4 +53,12 @@ private:
 	InverseKinematics inverse_kinematics_;
 	DirectKinematics direct_kinematics_;
 	PathPlanner path_planner_;
+	boost::numeric::ublas::matrix<double> robot_to_cam_transformation_;
+	boost::numeric::ublas::matrix<double> endeffector_to_needletip_transformation_;
+
+
+	boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose);
+	boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose, bool use_orthogonalization);
+
+
 };

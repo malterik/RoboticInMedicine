@@ -3,9 +3,12 @@
 #include <boost/math/constants/constants.hpp>
 
 #define PI boost::math::constants::pi<double>()
+#define AE_INT_T int
 
 UR5::UR5() :tcp_client_(new TcpClient)
 {
+	robot_to_cam_transformation_ = boost::numeric::ublas::matrix<double>(4,4);
+	endeffector_to_needletip_transformation_ = boost::numeric::ublas::matrix<double>(4, 4);
 }
 
 UR5::~UR5(){}
@@ -327,4 +330,84 @@ void UR5::orientateAlongVector(double x, double y, double z){
 	theta_z = acos(inner_prod(e_z, vector) / norm_2(e_z) * norm_2(vector));
 
 	rotateEndEffector(theta_x, theta_y, theta_z);
+}
+
+boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose)
+{
+	return convertCamToRobPose(camPose, true);
+}
+
+boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose, bool use_orthogonalization)
+{
+	boost::numeric::ublas::matrix<double> transformationMatrix(4, 4);
+	
+	if (use_orthogonalization)
+	{
+		// orthonormalize pose
+		
+		alglib::real_1d_array w;
+		alglib::real_2d_array u;
+		alglib::real_2d_array vt;
+
+		alglib::real_2d_array a;
+		a.setlength(3, 3);
+
+		boost::numeric::ublas::matrix<double> pose = prod(robot_to_cam_transformation_, camPose);
+
+		for (int i = 0; i < 3; i++)
+		{
+			for (int j = 0; j < 3; j++)
+			{
+				a[i][j] = pose(i, j);
+			}
+		}
+
+
+		alglib::rmatrixsvd(a, a.cols(), a.rows(), 2, 2, 2, w, u, vt);
+
+		int uCols = u.cols();
+		int uRows = u.rows();
+		int vtCols = vt.cols();
+		int vtRows = vt.rows();
+
+		boost::numeric::ublas::matrix<double> uBoost(uCols, uRows);
+		boost::numeric::ublas::matrix<double> vtBoost(vtCols, vtRows);
+
+		for (int i = 0; i < u.cols(); i++)
+		{
+			for (int j = 0; j < u.rows(); j++)
+			{
+				uBoost(i, j) = u[i][j];
+			}
+		}
+
+		for (int i = 0; i < vt.cols(); i++)
+		{
+			for (int j = 0; j < vt.rows(); j++)
+			{
+				vtBoost(i, j) = vt[i][j];
+			}
+		}
+
+		boost::numeric::ublas::matrix<double> rot = prod(uBoost, vtBoost);
+
+		transformationMatrix <<= rot(0, 0), rot(0, 1), rot(0, 2), pose(0, 3),
+			rot(1, 0), rot(1, 1), rot(1, 2), pose(1, 3),
+			rot(2, 0), rot(2, 1), rot(2, 2), pose(2, 3),
+			0, 0, 0, 1;
+	}
+
+	else
+	{
+		// take transformation matrix as is	
+
+		transformationMatrix = robot_to_cam_transformation_;
+	}
+	
+	return prod(transformationMatrix, camPose);
+}
+
+void UR5::setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation)
+{
+	robot_to_cam_transformation_ = robot_to_cam_transformation;
 }

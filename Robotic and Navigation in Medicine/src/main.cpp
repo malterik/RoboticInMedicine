@@ -15,11 +15,15 @@
 #include <thread>
 
 #include <boost\math\constants\constants.hpp>
+
+#include "boost/numeric/ublas/matrix.hpp"
+#include "boost/numeric/ublas/assignment.hpp"
+#include "Tools/CSVParser.hpp"
 #define PI boost::math::constants::pi<double>()
 
 int main(int argc, char* argv[])
 {
-	matrix<double> trans(4,4);
+	/*matrix<double> trans(4,4);
 	//USHandler ush;
 	trans(0, 0) = -0.294;
 	trans(1, 0) = 0.2461;
@@ -66,7 +70,7 @@ int main(int argc, char* argv[])
 
 	targetRobotCoord = prod(trans, targetCameraCoord);
 
-	std::cout << targetRobotCoord << std::endl;
+	std::cout << targetRobotCoord << std::endl;*/
 
 
 	//ush.processImage();
@@ -74,7 +78,7 @@ int main(int argc, char* argv[])
 	UR5 robot;
 
 	////connect to the robot
-	robot.connectToRobot(ROBOT_IP_LABOR, ROBOT_PORT);
+	/*robot.connectToRobot(ROBOT_IP_LABOR, ROBOT_PORT);
 	//set the robot's joints
 
 	robot.setSpeed(10);
@@ -104,7 +108,19 @@ int main(int argc, char* argv[])
 	//}
 	//robot.moveToHomePosition();
 	
-	cv::waitKey(0);
+	//cv::waitKey(0);*/
+
+	
+
+	CSVParser csvParser;
+	boost::numeric::ublas::matrix<double> N = csvParser.readHTM("C:\\Users\\LMM\\workspace\\RoboticInMedicine\\Robotic and Navigation in Medicine\\N.csv");
+	boost::numeric::ublas::matrix<double> Y = csvParser.readHTM("C:\\Users\\LMM\\workspace\\RoboticInMedicine\\Robotic and Navigation in Medicine\\Y.csv");
+
+	robot.setRobotToCamTransformation(Y);
+
+	robot.convertCamToRobPose(N);
+
 	system("Pause");
 	return 0;
 }
+
