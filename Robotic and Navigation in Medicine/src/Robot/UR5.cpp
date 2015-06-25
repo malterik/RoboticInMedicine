@@ -290,3 +290,34 @@ void UR5::moveToPose(matrix<double> endPose) {
 	}
 }
 
+void UR5::orientateAlongVector(double x, double y, double z){
+	double theta_x, theta_y, theta_z;
+
+	boost::numeric::ublas::vector<double> vector(3);
+
+	
+	//Einheitsvektoren
+	boost::numeric::ublas::vector<double> e_x(3);
+	boost::numeric::ublas::vector<double> e_y(3);
+	boost::numeric::ublas::vector<double> e_z(3);
+
+	vector.insert_element(0, x);
+	vector.insert_element(1, y);
+	vector.insert_element(2, z);
+	
+	for (int i = 0; i < 3; i++) {
+		e_x.insert_element(i, 0);
+		e_y.insert_element(i, 0);
+		e_z.insert_element(i, 0);
+	}
+
+	e_x[0] = 1;
+	e_y[1] = 1;
+	e_z[2] = 1;
+
+	theta_x = acos(inner_prod(e_x, vector) / norm_2(e_x) * norm_2(vector));
+	theta_y = acos(inner_prod(e_y, vector) / norm_2(e_y) * norm_2(vector));
+	theta_z = acos(inner_prod(e_z, vector) / norm_2(e_z) * norm_2(vector));
+
+	rotateEndEffector(theta_x, theta_y, theta_z);
+}

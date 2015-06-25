@@ -34,6 +34,7 @@ public:
 	void moveToPose(matrix<double> endPose);
 
 	void moveAlongVector(double x, double y, double z);
+	void orientateAlongVector(double x, double y, double z);
 	void moveToHomePosition();
 	void waitUntilFinished();
 

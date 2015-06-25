@@ -34,8 +34,15 @@ int main(int argc, char* argv[])
 	/*robot.moveToHomePosition();
 	std::this_thread::sleep_for(std::chrono::milliseconds(15000));*/
 	
-	robot.moveToPose(0.50, 0,0.01,0,PI,0);
-	//std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+	//robot.moveToPose(0.50, -0.3,0.2,0,0,0);
+	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+	robot.orientateAlongVector(-1, 0, 0);
+	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+	robot.orientateAlongVector(0, 0, 1);
+	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+	robot.orientateAlongVector(0, 0, -1);
+	std::this_thread::sleep_for(std::chrono::milliseconds(10000));
+	robot.orientateAlongVector(1, 1, 1);
 	//robot.rotateEndEffector(0, PI/2, 0);
 	//std::this_thread::sleep_for(std::chrono::milliseconds(15000));
 	//for (double y = 0; y < 0.2; y += 0.005){
