@@ -11,6 +11,8 @@
 #include "../ALGLIB/linalg.h"
 #include "boost/numeric/ublas/matrix.hpp"
 #include "boost/numeric/ublas/assignment.hpp"
+#include <chrono>
+#include <thread>
 
 #define ROBOT_IP_LOCAL "192.168.56.101"
 #define ROBOT_IP_LABOR "134.28.45.95"
@@ -44,7 +46,7 @@ public:
 
 	void setSpeed(double speedValue);
 	void moveToHomePosition();
-	void waitUntilFinished();
+	void waitUntilFinished(int pollTime);
 
 
 
