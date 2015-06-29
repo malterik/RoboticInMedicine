@@ -35,14 +35,20 @@ public:
 	*
 	*/
 	void moveToPosition(double x, double y, double z);
+	void moveToPosition(vector<double> vec);
 	//Keep the position and rotate the effector by the given angles
-	void rotateEndEffector(double theta_x, double theta_y, double theta_z);
+	matrix<double> rotateEndEffector(double theta_x, double theta_y, double theta_z);
 
 	void moveToPose(double x, double y, double z, double theta_x, double theta_y, double theta_z);
 	void moveToPose(matrix<double> endPose);
 
 	void moveAlongVector(double x, double y, double z);
-	void orientateAlongVector(double x, double y, double z);
+	void moveAlongVector(vector<double> vec);
+
+	matrix<double> orientateAlongVector(double x, double y, double z);
+	matrix<double> orientateAlongVector(vector<double> vec);
+
+	void doNeedlePlacement(vector<double> target, vector<double> window, matrix<double> needleTip);
 
 	void setSpeed(double speedValue);
 	void moveToHomePosition();

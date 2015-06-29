@@ -1,4 +1,6 @@
 #include "PathPlanner.h"
+
+
 #include <iostream>
 PathPlanner::PathPlanner(){
 
@@ -49,3 +51,4 @@ std::vector<JointAngles> PathPlanner::checkForValidConfigurations(std::vector<Jo
 
 	return result;
 }
+

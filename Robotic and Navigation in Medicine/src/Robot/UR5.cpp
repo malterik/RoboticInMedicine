@@ -1,7 +1,7 @@
 #include "UR5.h"
 
 #include <boost/math/constants/constants.hpp>
-
+#include "../Math/InvertMatrix.h"
 #define PI boost::math::constants::pi<double>()
 #define AE_INT_T int
 
@@ -77,7 +77,7 @@ void UR5::moveToPosition(double x, double y, double z){
 	endPose(0, 3) = x;
 	endPose(1, 3) = y;
 	endPose(2, 3) = z;
-	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
+	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose).solutions;
 	if (endPoseJoints.size() > 0) {
 		setJoints(path_planner_.chooseNearest(currentAngles,path_planner_.checkForValidConfigurations(endPoseJoints))); 
 	}
@@ -89,7 +89,7 @@ void UR5::moveToPosition(double x, double y, double z){
 
 }
 
-void UR5::rotateEndEffector(double theta_x, double theta_y, double theta_z) {
+matrix<double> UR5::rotateEndEffector(double theta_x, double theta_y, double theta_z) {
 	matrix<double> rotX(3, 3);
 	matrix<double> rotY(3, 3);
 	matrix<double> rotZ(3, 3);
@@ -154,7 +154,7 @@ void UR5::rotateEndEffector(double theta_x, double theta_y, double theta_z) {
 		}
 	}
 
-	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
+	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose).solutions;
 
 	if (endPoseJoints.size() > 0) {
 		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)));
@@ -162,7 +162,7 @@ void UR5::rotateEndEffector(double theta_x, double theta_y, double theta_z) {
 	else{
 		std::cout << "Error: No IK Solution Found" << std::endl;
 	}
-
+	return endPose;
 	
 }
 
@@ -179,7 +179,7 @@ void UR5::moveAlongVector(double x, double y, double z) {
 	endPose(1, 3) += y;
 	endPose(2, 3) += z;
 
-	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
+	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose).solutions;
 
 	if (endPoseJoints.size() > 0) {
 		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)));
@@ -301,13 +301,15 @@ void UR5::moveToPose(double x, double y, double z, double theta_x, double theta_
 	endPose(1, 3) = y;
 	endPose(2, 3) = z;
 
-	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
+	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose).solutions;
 	if (endPoseJoints.size() > 0) {
 		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)));
 	}
 	else{
 		std::cout << "Error: No IK Solution Found" << std::endl;
 	}
+
+
 }
 
 void UR5::moveToPose(matrix<double> endPose) {
@@ -315,7 +317,7 @@ void UR5::moveToPose(matrix<double> endPose) {
 	JointAngles currentAngles;
 
 	currentAngles = getJoints("rad");
-	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
+	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose).solutions;
 	if (endPoseJoints.size() > 0) {
 		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)));
 	}
@@ -324,7 +326,7 @@ void UR5::moveToPose(matrix<double> endPose) {
 	}
 }
 
-void UR5::orientateAlongVector(double x, double y, double z){
+matrix<double> UR5::orientateAlongVector(double x, double y, double z){
 	double theta_x, theta_y, theta_z;
 
 	boost::numeric::ublas::vector<double> vector(3);
@@ -358,7 +360,7 @@ void UR5::orientateAlongVector(double x, double y, double z){
 		yAngle2 -= PI;
 	}
 	
-	rotateEndEffector((2*PI) - xAngle, yAngle2, 0);
+	return rotateEndEffector((2*PI) - xAngle, yAngle2, 0);
 }
 
 boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose)
@@ -439,4 +441,65 @@ boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::u
 void UR5::setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation)
 {
 	robot_to_cam_transformation_ = robot_to_cam_transformation;
+}
+
+matrix<double> UR5::orientateAlongVector(vector<double> vec){
+	return orientateAlongVector(vec[0], vec[1], vec[2]);
+}
+
+void UR5::moveAlongVector(vector<double> vec){
+	moveAlongVector(vec[0], vec[1], vec[2]);
+}
+
+void UR5::moveToPosition(vector<double> vec){
+	moveToPosition(vec[0], vec[1], vec[2]);
+}
+
+void UR5::doNeedlePlacement(vector<double> target, vector<double> window, matrix<double> needleTip) {
+	IKResult result, oldResult;
+	vector<double> direction(3);
+	vector<double> homoTarget(4);
+	vector<double> homoWindow(4);
+	vector<double> homoDirection(4);
+	vector<double> nextPos(4);
+	matrix<double> pose(4, 4);
+	bool done = false;
+	setSpeed(10);
+
+	
+	direction = target - window;
+	direction = direction / norm_2(direction);		//normalize direction vector
+	//init Homogenous coordinates
+	
+	for (int i = 0; i < 4; i++) {
+		if (i == 3) {
+			homoTarget(i) = 1;
+			homoWindow(i) = 1;
+			homoDirection(i) = 1;
+		}
+		else{
+			homoTarget(i) = target(i);
+			homoWindow(i) = window(i);
+			homoDirection(i) = direction(i);
+		}
+	}
+	pose = orientateAlongVector(direction);
+
+	//determine the farest pose away from the target that is reachable with the same joint configuration
+	oldResult = inverse_kinematics_.computeInverseKinematics(pose);
+	while (!done) {
+		nextPos = column(pose, 3) - (homoDirection * 0.05);
+		for (int i = 0; i < 4; i++)
+			pose(i, 3) = nextPos(i);
+		result = inverse_kinematics_.computeInverseKinematics(pose);
+		//todo choose nearest
+		for (int j = 0; j < oldResult.configuration.size() && result.configuration.size(); j++){
+			if (norm_2(oldResult.configuration[j] - result.configuration[j]) != 0) {
+				done = true;
+			}
+		}
+		
+	}
+
+
 }
