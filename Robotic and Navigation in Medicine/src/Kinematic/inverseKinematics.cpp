@@ -12,13 +12,13 @@ using namespace boost::numeric::ublas;
 
 InverseKinematics::InverseKinematics() {
 
-	//SHOULDER =	{{ 1, 1, 1, 1, -1, -1, -1, -1 }};
-	//ELBOW =		{{ 1, 1, -1, -1, 1, 1, -1, -1 }};
-	//WRIST =		{{ 1, -1, 1, -1, 1, -1, 1, -1 }};
+	SHOULDER =	{{ 1, 1, 1, 1, -1, -1, -1, -1 }};
+	ELBOW =		{{ 1, 1, -1, -1, 1, 1, -1, -1 }};
+	WRIST =		{{ 1, -1, 1, -1, 1, -1, 1, -1 }};
 
-	SHOULDER =	{{  1,  1, -1, -1 }};
-	ELBOW =		{{ -1, -1, -1, -1 }};
-	WRIST =		{{  1, -1,  1, -1 }};
+	//SHOULDER =	{{  1,  1, -1, -1 }};
+	//ELBOW =		{{ 1, 1, 1, 1 }};
+	//WRIST =		{{  1, -1,  1, -1 }};
   }
 
 

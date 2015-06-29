@@ -38,7 +38,7 @@ std::vector<JointAngles> PathPlanner::checkForValidConfigurations(std::vector<Jo
 		for (int j = 0; j < 6; j++) {
 			jointPosition = direct_kinematics_.getPositionOfJoint(j, configs[i]);
 			//If the z coordinate of the joint is above the table
-			if (jointPosition(2, 3) > 0) {
+			if (jointPosition(2, 3) > 0.05) {
 				value++;
 			}
 		}
