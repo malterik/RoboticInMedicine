@@ -15,7 +15,7 @@
     camLocator = 'RobAdapter'; % locator name  
     
     % Output settings
-    camHTMsFile = 'Data\camNeedleHTMs.mat'; % output file for camera HTMs
+    camHTMsFile = 'camNeedleHTMs.mat'; % output file for camera HTMs
 
 %% Initialization
     % Connect to CamBarServer, if necessary
