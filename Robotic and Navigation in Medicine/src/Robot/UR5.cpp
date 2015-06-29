@@ -203,15 +203,24 @@ void UR5::moveToHomePosition(){
 /// </remarks>
 /// <param name="pollTime">The poll time.</param>
 void UR5::waitUntilFinished(int pollTime){
-	const char* respString;
+	std::string respString;
+	std::string respString_old;
 	int queueLength = INT_MAX;
+	bool finished = false;
 
 	// get queue length until queue is empty
-	while (queueLength > 0)
+	while (!finished)
 	{
-		respString = tcp_client_->command("GetQueueLength");
-		sscanf(respString, "%d", &queueLength);
-		std::this_thread::sleep_for(std::chrono::milliseconds(pollTime));
+		respString = std::string(tcp_client_->command("GetPositionJoints"));
+		if (respString.compare(respString_old) != 0) {
+			respString_old = respString;
+			std::this_thread::sleep_for(std::chrono::milliseconds(pollTime));
+			continue;			
+		}
+		else {
+			finished = true;
+			std::cout << "Finished" << std::endl;
+		}
 	}
 }
 
@@ -353,7 +362,7 @@ void UR5::orientateAlongVector(double x, double y, double z){
 
 	double yAngle2 = acos(yzLength / vecLength);
 	std::cout << xAngle << "  " << yAngle  << " " << yAngle2 << std::endl;
-	//rotateEndEffector((2*PI) - xAngle, yAngle, 0);
+	rotateEndEffector((2*PI) - xAngle, yAngle, 0);
 }
 
 boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose)
