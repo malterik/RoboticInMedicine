@@ -104,7 +104,7 @@ for idx = 0:numImages-1
     % It is also helpful to estimate mm per pixel
     % Counting the white pixels in each column, to find out the width in
     % pixels. This will correspond to 38mm (from the probe).
-    sumRow = sum(I,1);
+    sumRow = sum(allImages(:,:,idx+1),1);
     indF = find(sumRow, 1, 'first');
     indL = find(sumRow, 1, 'last');
     widthPxUS = indL - indF + 1;

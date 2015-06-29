@@ -195,9 +195,24 @@ void UR5::moveToHomePosition(){
 	setJoints(homePos);
 }
 
-void UR5::waitUntilFinished(){
-	const char *respString;
-	tcp_client_->write("GetQueueLength");
+/// <summary>
+/// Waits the until robot has finished movement.
+/// </summary>
+/// <remarks>
+/// The robot movement is finished when no commands are left in its queue. Therefore the method waits for an empty queue.
+/// </remarks>
+/// <param name="pollTime">The poll time.</param>
+void UR5::waitUntilFinished(int pollTime){
+	const char* respString;
+	int queueLength = INT_MAX;
+
+	// get queue length until queue is empty
+	while (queueLength > 0)
+	{
+		respString = tcp_client_->command("GetQueueLength");
+		sscanf(respString, "%d", &queueLength);
+		std::this_thread::sleep_for(std::chrono::milliseconds(pollTime));
+	}
 }
 
 void UR5::setSpeed(double speedValue) {

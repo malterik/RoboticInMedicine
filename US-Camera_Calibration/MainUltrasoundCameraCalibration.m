@@ -52,10 +52,23 @@ surf(rmsDistFromMean(4)*x+meanPointsPhantom(1,4),rmsDistFromMean(4)*y+meanPoints
 % Also, make sure contrast of the images is apropriate for good
 % segmentation results.
 
+
+%
+%
+%
+%        CC          p1 ZZZZZZZZZZ p2
+%    CCCCCC                    ZZ        c3
+%    Camera                 ZZZ          c2
+%    CCCCCC              ZZ              c1
+%        CC          p3 ZZZZZZZZZZ p4
+%
+%
+%
+
 %% Segmenting Ultrasound images
 numImages = 20;
 [cc1, cc2, cc3, xmmPerPx, ymmPerPx, allImages] = segmentZPhantomPointsInUSImages('data\ultrasoundImagesAndPoses\fileout_', numImages);
-xmmPerPx = ymmPerPx;
+
 c1 = cc1;
 c2 = cc2;
 c3 = cc3;
@@ -136,96 +149,102 @@ ylabel('y')
 zlabel('z')
 title('Z-Wire Phantom and detected mid-points in camera reference frame')
 
-%% Transform Images to Camera coordinate system
-sz = size(allImages);
-numPx = sz(1)*sz(2);
-xImRange = xmmPerPx*(0:sz(2)-1); % locations along x-axis in images
-yImRange = ymmPerPx*(0:sz(1)-1); % locations along y-axis in images
-[xgrid, ygrid] = meshgrid(xImRange,yImRange); % creating a grid using above locations
+calError = zeros(1,numImages);
+for it = 1:numImages
+    calError(it) = norm(zMidCamera(it,:)'-zInImageToCamera(it,:)');
+end;
+disp(['Mean calibration error in mm: ' num2str(mean(calError))]);
 
-% In order to (later) interpolate to get a reconstructed volume. It would
-% be helpful to use the following datastructure 
-% X Y Z Intenstity (for all the pixels in all images)
-%|-----|
-%   |
-%   V
-% These should be in camera coordinate system.
-imageAs3DPtsInImageWithIntensity = [xgrid(:) ygrid(:) zeros(numPx,1) ones(numPx,1)];
-allImagesAs3DPtsInWorldWithIntensity = zeros(numImages*numPx,4);
-for idx = 1:numImages
-    tfMatProbeToCamera = reshape(probePoses(idx,:), 4,4)';
-    imageAs3DPtsInWorldWithIntensity = (tfMatProbeToCamera*tfMatImageToProbe*imageAs3DPtsInImageWithIntensity')';
-    allImagesAs3DPtsInWorldWithIntensity((idx-1)*numPx+1:idx*numPx, 1:3) = imageAs3DPtsInWorldWithIntensity(:,1:3);
-    Icurr = allImages(:,:,idx);
-    allImagesAs3DPtsInWorldWithIntensity((idx-1)*numPx+1:idx*numPx, 4) = Icurr(:);
-end
-
-%% Interpolating the volume
-minV = min(allImagesAs3DPtsInWorldWithIntensity(:,1:3));
-maxV = max(allImagesAs3DPtsInWorldWithIntensity(:,1:3));
-midV = (minV+maxV)/2;
-diffV = (maxV-minV);
-
-% The mat-file contains an interpolated reconstructed volume of the z-wire
-% phantom from an earlier experiment
-if (exist('data\zWirePhantomVolume.mw', 'file'))
-    load('data\zWirePhantomVolume.mw', '-mat');
-else    
-    % creating a grid where we would like to interpolate the data
-    [XV,YV,ZV] = meshgrid(minV(1)+1:0.5:maxV(1)-1,minV(2)+1:0.5:maxV(2)-1,minV(3)+1:0.5:maxV(3)-1);
-    % Interpolating the scattered data - this might take a long time -
-    % therefore it would be advisable to save the interpolated volume in a
-    % mat-file
-    Vq = griddata(allImagesAs3DPtsInWorldWithIntensity(:,1),allImagesAs3DPtsInWorldWithIntensity(:,2),allImagesAs3DPtsInWorldWithIntensity(:,3),allImagesAs3DPtsInWorldWithIntensity(:,4),XV,YV,ZV,'natural');
-end
-
-%% Visualization of the volume
-% plot isosurfaces at each level, using direct color mapping
-scrsz = get(groot,'ScreenSize');
-figure('Renderer','opengl','Position',[10 scrsz(4)*3/4 scrsz(3)*3/4 scrsz(4)*3/4]);
-
-% volumetric data, and iso-levels we want to visualize
-isovalues = linspace(10,40,4);
-fAlphaVals = linspace(0.1,0.4,4);
-fAlphaVals(4) = 1;
-num = numel(isovalues);
-
-p = zeros(num,1);
-for i=1:num
-    p(i) = patch( isosurface(XV,YV,ZV,Vq,isovalues(i)) );
-    isonormals(XV,YV,ZV,Vq,p(i))
-    set(p(i), 'CData',i);
-    set(p(i), 'FaceAlpha',fAlphaVals(i));
-end
-set(p, 'CDataMapping','direct', 'FaceColor','flat', 'EdgeColor','none')
-
-% define the colormap
-clr = hsv(num);
-colormap(clr)
-
-% fix the colorbar to show iso-levels and their corresponding color
-caxis([0 num])
-colorbar('YTick',(1:num)+0.5, 'YTickLabel',num2str(isovalues(:)))
-
-% tweak the plot and view
-box on; grid on; view(-95,-35);
-axis tight;
-axis vis3d; daspect([1 1 1])
-camproj perspective
-camlight; lighting gouraud;
-rotate3d on
-
-title('Example: Reconstructed volume of the z-wire phantom')
-
-hold on
-mp = zeros(2,1);idp = 1;
-mp(idp) = plot3(meanPointsPhantom(1,:), meanPointsPhantom(2,:), meanPointsPhantom(3,:), '*-');idp = idp+1;
-% mp(idp) = plot3(zMidCamera(:,1), zMidCamera(:,2), zMidCamera(:,3), '*');idp = idp+1;
-hold off;
-
-angRot = 10;
-for idy = 1:90/angRot
-    rotate([p; mp],normalToZWire,angRot)
-    drawnow
-    pause(0.01)
-end
+% %% Transform Images to Camera coordinate system
+% sz = size(allImages);
+% numPx = sz(1)*sz(2);
+% xImRange = xmmPerPx*(0:sz(2)-1); % locations along x-axis in images
+% yImRange = ymmPerPx*(0:sz(1)-1); % locations along y-axis in images
+% [xgrid, ygrid] = meshgrid(xImRange,yImRange); % creating a grid using above locations
+% 
+% % In order to (later) interpolate to get a reconstructed volume. It would
+% % be helpful to use the following datastructure 
+% % X Y Z Intenstity (for all the pixels in all images)
+% %|-----|
+% %   |
+% %   V
+% % These should be in camera coordinate system.
+% imageAs3DPtsInImageWithIntensity = [xgrid(:) ygrid(:) zeros(numPx,1) ones(numPx,1)];
+% allImagesAs3DPtsInWorldWithIntensity = zeros(numImages*numPx,4);
+% for idx = 1:numImages
+%     tfMatProbeToCamera = reshape(probePoses(idx,:), 4,4)';
+%     imageAs3DPtsInWorldWithIntensity = (tfMatProbeToCamera*tfMatImageToProbe*imageAs3DPtsInImageWithIntensity')';
+%     allImagesAs3DPtsInWorldWithIntensity((idx-1)*numPx+1:idx*numPx, 1:3) = imageAs3DPtsInWorldWithIntensity(:,1:3);
+%     Icurr = allImages(:,:,idx);
+%     allImagesAs3DPtsInWorldWithIntensity((idx-1)*numPx+1:idx*numPx, 4) = Icurr(:);
+% end
+% 
+% %% Interpolating the volume
+% minV = min(allImagesAs3DPtsInWorldWithIntensity(:,1:3));
+% maxV = max(allImagesAs3DPtsInWorldWithIntensity(:,1:3));
+% midV = (minV+maxV)/2;
+% diffV = (maxV-minV);
+% 
+% % The mat-file contains an interpolated reconstructed volume of the z-wire
+% % phantom from an earlier experiment
+% if (exist('data\zWirePhantomVolume.mw', 'file'))
+%     load('data\zWirePhantomVolume.mw', '-mat');
+% else    
+%     % creating a grid where we would like to interpolate the data
+%     [XV,YV,ZV] = meshgrid(minV(1)+1:0.5:maxV(1)-1,minV(2)+1:0.5:maxV(2)-1,minV(3)+1:0.5:maxV(3)-1);
+%     % Interpolating the scattered data - this might take a long time -
+%     % therefore it would be advisable to save the interpolated volume in a
+%     % mat-file
+%     Vq = griddata(allImagesAs3DPtsInWorldWithIntensity(:,1),allImagesAs3DPtsInWorldWithIntensity(:,2),allImagesAs3DPtsInWorldWithIntensity(:,3),allImagesAs3DPtsInWorldWithIntensity(:,4),XV,YV,ZV,'natural');
+% end
+% 
+% %% Visualization of the volume
+% % plot isosurfaces at each level, using direct color mapping
+% scrsz = get(groot,'ScreenSize');
+% figure('Renderer','opengl','Position',[10 scrsz(4)*3/4 scrsz(3)*3/4 scrsz(4)*3/4]);
+% 
+% % volumetric data, and iso-levels we want to visualize
+% isovalues = linspace(10,40,4);
+% fAlphaVals = linspace(0.1,0.4,4);
+% fAlphaVals(4) = 1;
+% num = numel(isovalues);
+% 
+% p = zeros(num,1);
+% for i=1:num
+%     p(i) = patch( isosurface(XV,YV,ZV,Vq,isovalues(i)) );
+%     isonormals(XV,YV,ZV,Vq,p(i))
+%     set(p(i), 'CData',i);
+%     set(p(i), 'FaceAlpha',fAlphaVals(i));
+% end
+% set(p, 'CDataMapping','direct', 'FaceColor','flat', 'EdgeColor','none')
+% 
+% % define the colormap
+% clr = hsv(num);
+% colormap(clr)
+% 
+% % fix the colorbar to show iso-levels and their corresponding color
+% caxis([0 num])
+% colorbar('YTick',(1:num)+0.5, 'YTickLabel',num2str(isovalues(:)))
+% 
+% % tweak the plot and view
+% box on; grid on; view(-95,-35);
+% axis tight;
+% axis vis3d; daspect([1 1 1])
+% camproj perspective
+% camlight; lighting gouraud;
+% rotate3d on
+% 
+% title('Example: Reconstructed volume of the z-wire phantom')
+% 
+% hold on
+% mp = zeros(2,1);idp = 1;
+% mp(idp) = plot3(meanPointsPhantom(1,:), meanPointsPhantom(2,:), meanPointsPhantom(3,:), '*-');idp = idp+1;
+% % mp(idp) = plot3(zMidCamera(:,1), zMidCamera(:,2), zMidCamera(:,3), '*');idp = idp+1;
+% hold off;
+% 
+% angRot = 10;
+% for idy = 1:90/angRot
+%     rotate([p; mp],normalToZWire,angRot)
+%     drawnow
+%     pause(0.01)
+% end

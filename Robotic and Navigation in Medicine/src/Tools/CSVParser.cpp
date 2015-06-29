@@ -125,3 +125,55 @@ boost::numeric::ublas::vector<double> CSVParser::readVector3D(std::string fileNa
 	}
 	return vector;
 }
+
+/// <summary>
+/// Imports window points from CSV file.
+/// </summary>
+/// <remarks>
+///	The file is expected to have four vector listed in single lines containing the three vector elements. This can be achieved using MATLAB's bulit-in csvwrite command on a 3x4 vector.
+/// </remarks>
+/// <returns>A homogenous transformation matrix</returns>
+std::vector<boost::numeric::ublas::vector<double>> CSVParser::readWindow(std::string fileName)
+{
+	std::vector<boost::numeric::ublas::vector<double>> windowPoints;
+	std::vector<std::vector<double>> data;
+	std::ifstream infile(fileName);
+
+	// parse data into two-dimensional float array
+	while (infile)
+	{
+		std::string s;
+		if (!getline(infile, s)) break;
+
+		std::istringstream ss(s);
+		std::vector<double> record;
+
+		while (ss)
+		{
+			std::string s;
+			if (!getline(ss, s, ',')) break;
+			record.push_back(std::strtod(s.c_str(), NULL));
+		}
+
+		data.push_back(record);
+	}
+
+	int numRows = data.size();
+	int numCols = data[0].size();
+
+	// create matrix from float array.
+	if (numRows == 4 && numCols == 3)
+	{
+		for (int i = 0; i < numRows; i++)
+		{
+			boost::numeric::ublas::vector<double> point(3);
+			point <<= data[i][0], data[i][1], data[i][2];
+			windowPoints.push_back(point);
+		}
+	}
+	else
+	{
+		std::cerr << "Invalid dimensions for HTM initialization.";
+	}
+	return windowPoints;
+}
