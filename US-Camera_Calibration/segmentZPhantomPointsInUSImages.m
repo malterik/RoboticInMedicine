@@ -1,4 +1,4 @@
-function [c1, c2, c3, xmmPerPx, ymmPerPx, allImages] = segmentZPhantomPointsInUSImages(filenamePref, numImages)
+function [c1, c2, c3, xmmPerPx, ymmPerPx, allImages] = segmentZPhantomPointsInUSImages(filenamePref, numImages, imgMask)
 %SEGMENTZPHANTOMPOINTSINUSIMAGES Segments the Ultrasound images
 %   SEGMENTZPHANTOMPOINTSINUSIMAGES(FILENAMEPREF, NUMIMAGES)
 %   Reads in NUMIMAGES images with the prefix FILENAMEPREF and outputs the
@@ -43,9 +43,9 @@ fhResult = figure;
 
 for idx = 0:numImages-1
     %delete(ims); delete(ims1);
-    disp(['Segmentation of image.. ' num2str(idx)]);
+    disp(['Segmentation of image.. ' num2str(imgMask(idx+1))]);
     % Reading the image
-    allImages(:,:,idx+1) = imread([filenamePref num2str(idx) '.jpg']);
+    allImages(:,:,idx+1) = imread([filenamePref num2str(imgMask(idx+1)) '.jpg']);
     I = allImages(:,:,idx+1);
     
     %ISeg = imread([filenameSegPref num2str(idx) '.jpg']);
@@ -62,7 +62,7 @@ for idx = 0:numImages-1
     
     % define ROI containing the 3 points
     fhRoi = figure;
-    imshow(I);
+    imshow(imcomplement(imadjust(I)));
     mask = roipoly;
     close(fhRoi);
     I(~mask) = 0;
@@ -109,7 +109,7 @@ for idx = 0:numImages-1
     indL = find(sumRow, 1, 'last');
     widthPxUS = indL - indF + 1;
     xmmPerPxAll(idx+1) = 38.0 / widthPxUS;
-    pause(0.1);
+    pause(0.5);
 end
 
 xmmPerPx = mean(xmmPerPxAll);

@@ -48,10 +48,10 @@ disp('Loading Stylus locator')
 % Load locator definition file stylus.xml from the config folder
 % The locator must be located on the camera-pc in the folder
 % C:\locators\
-jtcp('write',jTcpObj,int8('LoadLocator stylus')); pause(0.1);
+jtcp('write',jTcpObj,int8('LoadLocator stylusRNM')); pause(0.1);
 mssg = char(jtcp('read',jTcpObj)); disp(mssg);
 
-jtcp('write',jTcpObj,int8('LoadLocator stylus')); pause(0.1);
+jtcp('write',jTcpObj,int8('LoadLocator stylusRNM')); pause(0.1);
 mssg = char(jtcp('read',jTcpObj)); disp(mssg);
 
 disp('Starting the measurements...');
@@ -70,7 +70,7 @@ for rep = 1:numRepition
     while (i<=N)
         % Send the command word to get the locator position. The locator has to
         % be loaded before.
-        [T,timestamp] = GetLocatorTransformMatrix(t, 'stylus');
+        [T,timestamp] = GetLocatorTransformMatrix(jTcpObj, 'stylusRNM');
         if (sum(T(:))~=1)
             absPtNum = i+(rep-1)*N;
             TAll(:,absPtNum) = T(:);
@@ -85,7 +85,9 @@ for rep = 1:numRepition
             pause;
             i=i+1;
         else
-            disp('All zero T received. Try the same measurement again.')
+            warning('All zero T received. Try the same measurement again.')
+            disp('Press any key to continue to repeat measurement...')
+            pause;
         end
     end
 end
@@ -94,6 +96,5 @@ hold off;
 prompt = 'Do you want to save the measured data for later use? Y/N [N]: ';
 str = input(prompt,'s');
 if strcmpi(str,'y')
-    mkdir('./','ultrasoundImagesAndPoses')
-    save('ultrasoundImagesAndPoses/zWireEndPoints.mw','p','TAll');
+    save('data/zWireEndPoints.mw','p','TAll');
 end
