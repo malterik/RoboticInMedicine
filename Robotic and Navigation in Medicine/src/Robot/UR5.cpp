@@ -336,13 +336,24 @@ void UR5::orientateAlongVector(double x, double y, double z){
 	if (yzLength != 0) {
 		xAngle = acos(z / yzLength);
 	}
-	
+	if (y < 0) {
+		xAngle -= PI;
+	}
+
+	double xzLength = sqrt(pow(x, 2) + pow(z, 2));
+	double yAngle = 0;
+	if (xzLength != 0) {
+		yAngle = acos(z / xzLength);
+	}
+	if (x < 0) {
+		yAngle -= PI;
+	}
 	
 	double vecLength = norm_2(vector);
 
-	double yAngle = acos(yzLength / vecLength);
-	std::cout << xAngle << "  " << yAngle << std::endl;
-	rotateEndEffector((2*PI) - xAngle, yAngle, 0);
+	double yAngle2 = acos(yzLength / vecLength);
+	std::cout << xAngle << "  " << yAngle  << " " << yAngle2 << std::endl;
+	//rotateEndEffector((2*PI) - xAngle, yAngle, 0);
 }
 
 boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose)

@@ -74,12 +74,12 @@ int main(int argc, char* argv[])
 
 	UR5 robot;
 
-	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
+	robot.connectToRobot(ROBOT_IP_LABOR, ROBOT_PORT);
 
-	robot.setSpeed(100);
+	robot.setSpeed(10);
 
 	//robot.moveToPosition(0.6, 0.2, 0.2);
-	robot.orientateAlongVector(0,-1,0);
+	robot.orientateAlongVector(1,1,1);
 	system("Pause");
 	return 0;
 }
