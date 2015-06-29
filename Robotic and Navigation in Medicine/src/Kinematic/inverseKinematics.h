@@ -6,7 +6,7 @@
 #include "JointAngles.h"
 #include "../Robot/DenavitHartenberg.h"
 
-#define NUMBER_OF_SOLUTIONS 4
+#define NUMBER_OF_SOLUTIONS 8
 class InverseKinematics {
   public:
     InverseKinematics ();

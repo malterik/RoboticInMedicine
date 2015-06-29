@@ -141,8 +141,8 @@ void UR5::rotateEndEffector(double theta_x, double theta_y, double theta_z) {
 	rotZ(2, 2) = 1;
 
 	matrix<double> temp(3, 3);
-	temp = prod(rotY, rotZ);
-	endOrientation = prod(rotX, temp);
+	temp = prod(rotX, rotY);
+	endOrientation = prod(temp, rotZ);
 
 	
 	//Keep the current position
@@ -330,21 +330,19 @@ void UR5::orientateAlongVector(double x, double y, double z){
 	vector.insert_element(1, y);
 	vector.insert_element(2, z);
 	
-	for (int i = 0; i < 3; i++) {
-		e_x.insert_element(i, 0);
-		e_y.insert_element(i, 0);
-		e_z.insert_element(i, 0);
+
+	double yzLength = sqrt(pow(y, 2) + pow(z, 2));
+	double xAngle = 0;
+	if (yzLength != 0) {
+		xAngle = acos(z / yzLength);
 	}
+	
+	
+	double vecLength = norm_2(vector);
 
-	e_x[0] = 1;
-	e_y[1] = 1;
-	e_z[2] = 1;
-
-	theta_x = acos(inner_prod(e_x, vector) / norm_2(e_x) * norm_2(vector));
-	theta_y = acos(inner_prod(e_y, vector) / norm_2(e_y) * norm_2(vector));
-	theta_z = acos(inner_prod(e_z, vector) / norm_2(e_z) * norm_2(vector));
-
-	rotateEndEffector(theta_x, theta_y, theta_z);
+	double yAngle = acos(yzLength / vecLength);
+	std::cout << xAngle << "  " << yAngle << std::endl;
+	rotateEndEffector((2*PI) - xAngle, yAngle, 0);
 }
 
 boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose)

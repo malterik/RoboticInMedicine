@@ -29,6 +29,7 @@
     <ClCompile Include="src\Kinematic\JointAngles.cpp" />
     <ClCompile Include="src\Kinematic\PathPlanner.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\Math\Window.cpp" />
     <ClCompile Include="src\Network\TcpClient.cpp" />
     <ClCompile Include="src\Robot\DenavitHartenberg.cpp" />
     <ClCompile Include="src\Robot\UR5.cpp" />
@@ -59,6 +60,7 @@
     <ClInclude Include="src\Math\Matrix3x3.h" />
     <ClInclude Include="src\Math\RotationMatrix.h" />
     <ClInclude Include="src\Math\Vector3.h" />
+    <ClInclude Include="src\Math\Window.h" />
     <ClInclude Include="src\Network\TcpClient.h" />
     <ClInclude Include="src\Robot\DenavitHartenberg.h" />
     <ClInclude Include="src\Robot\UR5.h" />
