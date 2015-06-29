@@ -22,8 +22,9 @@ InverseKinematics::InverseKinematics() {
   }
 
 
-  std::vector<JointAngles> InverseKinematics::computeInverseKinematics (boost::numeric::ublas::matrix<double> endPose) {
+  IKResult InverseKinematics::computeInverseKinematics (boost::numeric::ublas::matrix<double> endPose) {
 	  std::vector<JointAngles> configs;
+	  IKResult res;
 	  for (unsigned int i = 0; i < NUMBER_OF_SOLUTIONS; i++) {
 
 
@@ -162,8 +163,14 @@ InverseKinematics::InverseKinematics() {
 
 		  JointAngles config_i(theta_1[i], theta_2[i], theta_3[i], theta_4[i], theta_5[i], theta_6[i]);
 		  configs.push_back(config_i);
+		  res.solutions = configs;
+		  boost::numeric::ublas::vector<int> temp;
+		  temp[0] = SHOULDER[i];
+		  temp[1] = ELBOW[i];
+		  temp[2] = WRIST[i];
+		  res.configuration.push_back(temp);
 }
 	
-	return configs;
+	return res;
   }	
 

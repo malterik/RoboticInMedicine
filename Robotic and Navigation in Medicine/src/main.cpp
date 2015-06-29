@@ -16,6 +16,7 @@
 
 #include <boost\math\constants\constants.hpp>
 
+#define Z_OFFSET 0.3
 #define PI boost::math::constants::pi<double>()
 
 int main(int argc, char* argv[])
@@ -71,15 +72,34 @@ int main(int argc, char* argv[])
 
 
 	//ush.processImage();
-
+	InverseKinematics ik;
+	IKResult new, old;
 	UR5 robot;
-
-	robot.connectToRobot(ROBOT_IP_LABOR, ROBOT_PORT);
-
+	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
 	robot.setSpeed(10);
 
+	double target_x, target_y, target_z;
+	target_x = -0.6;
+	target_y = -0.3;
+	target_z = 0.2;
+
+	vector<double> target_tumor(3);
+	vector<double> target_window(3);
+	vector<double> direction(3);
+
+	direction = target_window - target_tumor;
+	
+	robot.orientateAlongVector(direction[0], direction[1], direction[2]);
+	bool done = false;
+	while (!done) {
+
+	}
+	
+	robot.moveToPosition(target_x, target_y, target_z + Z_OFFSET);
+	robot.moveToPosition(target_x, target_y, target_z);
+
 	//robot.moveToPosition(0.6, 0.2, 0.2);
-	robot.orientateAlongVector(1,1,1);
+	
 	system("Pause");
 	return 0;
 }
