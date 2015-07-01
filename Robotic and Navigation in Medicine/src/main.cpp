@@ -15,6 +15,7 @@
 #include <thread>
 
 #include <boost\math\constants\constants.hpp>
+#include "Tools\CSVParser.hpp"
 
 #define Z_OFFSET 0.3
 #define PI boost::math::constants::pi<double>()
@@ -69,10 +70,20 @@ int main(int argc, char* argv[])
 	//targetRobotCoord = prod(trans, targetCameraCoord);
 
 	//std::cout << targetRobotCoord << std::endl;
+
+	// read files
+	CSVParser csvParser;
+	boost::numeric::ublas::matrix<double> robot_to_cam_transformation = csvParser.readHTM("rob2camDummy.csv");
+	boost::numeric::ublas::matrix<double> robot_to_needle_transformation = csvParser.readHTM("rob2needleDummy.csv");
+	//std::vector<boost::numeric::ublas::vector<double>> window = readWindow("window.csv");
+
 	UR5 robot;
 	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
+	robot.setRobotToCamTransformation(robot_to_cam_transformation);
+	robot.setRobotToNeedleTransformation(robot_to_needle_transformation);
 	vector<double> target(3), window(3);
-	matrix<double> needleTip(4, 4);
+	//matrix<double> needleTip(4, 4);
+	matrix<double> needleTip = robot.getRobotToNeedleTransformation();
 	target(0) = 0.3;
 	target(1) = 0.4;
 	target(2) = 0.2;
