@@ -7,6 +7,6 @@ function [ HTM, message ] = getHTM(socket, inStream, outStream)
     cmd = 'GetPositionHomRowWise';
     message = getAnswerFromServer(socket, inStream, outStream, cmd);
     messageSplit = strsplit(message,' ');
-    HTM = [reshape(str2double(messageSplit), [3, 4]); 0 0 0 1];
+    HTM = [reshape(str2double(messageSplit), [4, 3])'; 0 0 0 1];
 end
 

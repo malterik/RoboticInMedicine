@@ -7,8 +7,7 @@
     nMeasurements = 50; % number of measurements
   
     % Network settrings
-%     camIP = '134.28.45.63'; % camera ip
-    camIP = '127.0.0.1';
+	camIP = '134.28.45.63'; % camera ip
     camPort = 3000; % camera port   
     timeout = 3000; % timeout for tcp reads
     

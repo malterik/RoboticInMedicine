@@ -17,5 +17,6 @@ function [T, timestamp, isVisible, message] = getLocatorTransformMatrix(socket, 
     %   R00, R01, R02, X, R10, R11, R12, Y, R20, R21, R22, Z, 0, 0, 0, 1
     T = reshape(numbers(3:end), 4,4)';
     timestamp = numbers(1);
-    isVisible = numbers(2);
+    zeroMatrix = [0 0 0 0; 0 0 0 0; 0 0 0 0; 0 0 0 1];
+    isVisible = ~isequal(T,zeroMatrix);
 end
