@@ -69,8 +69,20 @@ int main(int argc, char* argv[])
 	//targetRobotCoord = prod(trans, targetCameraCoord);
 
 	//std::cout << targetRobotCoord << std::endl;
+	UR5 robot;
+	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
+	vector<double> target(3), window(3);
+	matrix<double> needleTip(4, 4);
+	target(0) = 0.3;
+	target(1) = 0.4;
+	target(2) = 0.2;
 
-
+	window(0) = 0.3;
+	window(1) = 0.3;
+	window(2) = 0.25;
+	robot.moveToHomePosition();
+	robot.waitUntilFinished(500);
+	robot.doNeedlePlacement(target, window, needleTip);
 	//ush.processImage();
 	
 	

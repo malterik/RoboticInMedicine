@@ -18,6 +18,7 @@
 #define ROBOT_IP_LABOR "134.28.45.95"
 #define ROBOT_PORT 5005
 
+#define Z_OFFSET_TO_TARGET 0.2
 class UR5 {
 
 public:
@@ -42,8 +43,8 @@ public:
 	void moveToPose(double x, double y, double z, double theta_x, double theta_y, double theta_z);
 	void moveToPose(matrix<double> endPose);
 
-	void moveAlongVector(double x, double y, double z);
-	void moveAlongVector(vector<double> vec);
+	matrix<double> moveAlongVector(double x, double y, double z);
+	matrix<double> moveAlongVector(vector<double> vec);
 
 	matrix<double> orientateAlongVector(double x, double y, double z);
 	matrix<double> orientateAlongVector(vector<double> vec);
