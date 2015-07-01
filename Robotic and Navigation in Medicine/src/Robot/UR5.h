@@ -25,8 +25,13 @@ public:
 	UR5();
 	~UR5();
 
+	boost::numeric::ublas::matrix<double> getRobotToCamTransformation();
+	boost::numeric::ublas::matrix<double> getRobotToNeedleTransformation();
 
 	void setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation);
+	void setRobotToNeedleTransformation(boost::numeric::ublas::matrix<double> robot_to_needle_transformation_);
+
+
 
 	bool connectToRobot(char* ip, int port);
 	bool setJoints(JointAngles angles);
@@ -63,7 +68,7 @@ private:
 	DirectKinematics direct_kinematics_;
 	PathPlanner path_planner_;
 	boost::numeric::ublas::matrix<double> robot_to_cam_transformation_;
-	boost::numeric::ublas::matrix<double> endeffector_to_needletip_transformation_;
+	boost::numeric::ublas::matrix<double> robot_to_needle_transformation_;
 
 
 	boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose);

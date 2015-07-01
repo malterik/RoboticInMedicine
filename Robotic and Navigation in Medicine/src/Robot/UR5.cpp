@@ -8,10 +8,29 @@
 UR5::UR5() :tcp_client_(new TcpClient)
 {
 	robot_to_cam_transformation_ = boost::numeric::ublas::matrix<double>(4,4);
-	endeffector_to_needletip_transformation_ = boost::numeric::ublas::matrix<double>(4, 4);
+	robot_to_needle_transformation_ = boost::numeric::ublas::matrix<double>(4, 4);
 }
 
 UR5::~UR5(){}
+
+boost::numeric::ublas::matrix<double> UR5::getRobotToCamTransformation()
+{
+	return robot_to_cam_transformation_;
+}
+boost::numeric::ublas::matrix<double> UR5::getRobotToNeedleTransformation()
+{
+	return robot_to_needle_transformation_;
+}
+
+void UR5::setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation)
+{
+	robot_to_cam_transformation_ = robot_to_cam_transformation;
+}
+
+void UR5::setRobotToNeedleTransformation(boost::numeric::ublas::matrix<double> robot_to_needle_transformation)
+{
+	robot_to_needle_transformation_ = robot_to_needle_transformation;
+}
 
 bool UR5::connectToRobot(char* ip, int port){
 	tcp_client_->connect(ip, port);
@@ -437,11 +456,6 @@ boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::u
 		return prod(robot_to_cam_transformation_, camPose);
 	}	
 	
-}
-
-void UR5::setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation)
-{
-	robot_to_cam_transformation_ = robot_to_cam_transformation;
 }
 
 matrix<double> UR5::orientateAlongVector(vector<double> vec){
