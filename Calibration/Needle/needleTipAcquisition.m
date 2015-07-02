@@ -56,4 +56,5 @@
     end;
 
 %% Save files
-    save(camHTMsFile, 'camNeedleHTMs');
+    needleEndHTMs = camNeedleHTMs(:,:,1:(acquisitionCounter-1));
+    save(camHTMsFile, 'needleEndHTMs');

@@ -10,7 +10,7 @@
 
     % Output settings
     calibrationMatricesFile = 'handEyeData.mat';
-    robotToCamFileCSV = 'robToCam.csv';
+    robotToCamFileCSV = 'rob2cam.csv';
     
 %% Initialization  
     % load files
