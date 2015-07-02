@@ -18,14 +18,20 @@
 #define ROBOT_IP_LABOR "134.28.45.95"
 #define ROBOT_PORT 5005
 
+#define Z_OFFSET_TO_TARGET 0.2
 class UR5 {
 
 public:
 	UR5();
 	~UR5();
 
+	boost::numeric::ublas::matrix<double> getRobotToCamTransformation();
+	boost::numeric::ublas::matrix<double> getRobotToNeedleTransformation();
 
 	void setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation);
+	void setRobotToNeedleTransformation(boost::numeric::ublas::matrix<double> robot_to_needle_transformation_);
+
+
 
 	bool connectToRobot(char* ip, int port);
 	bool setJoints(JointAngles angles);
@@ -35,14 +41,20 @@ public:
 	*
 	*/
 	void moveToPosition(double x, double y, double z);
+	void moveToPosition(vector<double> vec);
 	//Keep the position and rotate the effector by the given angles
-	void rotateEndEffector(double theta_x, double theta_y, double theta_z);
+	matrix<double> rotateEndEffector(double theta_x, double theta_y, double theta_z);
 
 	void moveToPose(double x, double y, double z, double theta_x, double theta_y, double theta_z);
 	void moveToPose(matrix<double> endPose);
 
-	void moveAlongVector(double x, double y, double z);
-	void orientateAlongVector(double x, double y, double z);
+	matrix<double> moveAlongVector(double x, double y, double z);
+	matrix<double> moveAlongVector(vector<double> vec);
+
+	matrix<double> orientateAlongVector(double x, double y, double z);
+	matrix<double> orientateAlongVector(vector<double> vec);
+
+	void doNeedlePlacement(vector<double> target, vector<double> window, matrix<double> needleTip);
 
 	void setSpeed(double speedValue);
 	void moveToHomePosition();
@@ -56,7 +68,7 @@ private:
 	DirectKinematics direct_kinematics_;
 	PathPlanner path_planner_;
 	boost::numeric::ublas::matrix<double> robot_to_cam_transformation_;
-	boost::numeric::ublas::matrix<double> endeffector_to_needletip_transformation_;
+	boost::numeric::ublas::matrix<double> robot_to_needle_transformation_;
 
 
 	boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose);
