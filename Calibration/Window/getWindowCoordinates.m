@@ -12,7 +12,7 @@
     timeout = 3000; % timeout for tcp reads
     
     % Camera settings
-    camLocator = 'stylus2'; % locator name  
+    camLocator = 'stylusRNM'; % locator name  
     
     % Output settings
     windowHTMsFile = 'windowHTMs.mat'; 
@@ -59,7 +59,7 @@
 %% extract positions from HTMs
     windowPositions = zeros(acquisitionCounter-1,3); 
     for i = 1:(acquisitionCounter-1);
-        windowPositions(i,:) = windowHTMs(1:3,4,i); 
+        windowPositions(i,:) = windowHTMs(1:3,4,i)/1000; 
     end;
     
     

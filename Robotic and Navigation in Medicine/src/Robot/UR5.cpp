@@ -481,7 +481,6 @@ void UR5::doNeedlePlacement(vector<double> target, vector<double> window, matrix
 	matrix<double> inverseNeedleTip(4,4);
 	JointAngles angles;
 	bool done = false;
-	setSpeed(100);
 
 	InvertMatrix(needleTip, inverseNeedleTip);
 
@@ -511,7 +510,7 @@ void UR5::doNeedlePlacement(vector<double> target, vector<double> window, matrix
 	pose = orientateAlongVector(direction);
 	pose(2, 3) -= Z_OFFSET_TO_TARGET;
 	waitUntilFinished(500);
-	moveToPosition(window - 0.3*direction);
+	moveToPosition(window - 0.2*direction);
 
 
 	//determine the farest pose away from the target that is reachable with the same joint configuration
@@ -546,4 +545,26 @@ void UR5::doNeedlePlacement(vector<double> target, vector<double> window, matrix
 	//}
 	//setJoints(angles);
 
+}
+
+vector<double> UR5::convertPixelToProbe(int x, int y) {
+
+	vector<double> result(4);
+	vector<double> pos(4);
+
+	pos(0) = x*0.0819;
+	pos(1) = y*0.0833;
+	pos(2) = 0;
+	pos(3) = 1;
+
+	result = prod(pixel_to_probe_transformation_, pos);
+
+	return result;
+}
+
+void UR5::setPixelToProbeTransformation(boost::numeric::ublas::matrix<double> pixel_to_probe_transformation){
+	pixel_to_probe_transformation_ = pixel_to_probe_transformation;
+}
+boost::numeric::ublas::matrix<double> UR5::getPixelToProbeTransformation() {
+	return pixel_to_probe_transformation_;
 }

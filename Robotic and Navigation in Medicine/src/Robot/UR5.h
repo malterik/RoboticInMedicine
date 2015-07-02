@@ -31,6 +31,9 @@ public:
 	void setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation);
 	void setRobotToNeedleTransformation(boost::numeric::ublas::matrix<double> robot_to_needle_transformation_);
 
+	void setPixelToProbeTransformation(boost::numeric::ublas::matrix<double> pixel_to_probe_transformation);
+	boost::numeric::ublas::matrix<double> getPixelToProbeTransformation();
+
 
 
 	bool connectToRobot(char* ip, int port);
@@ -61,7 +64,10 @@ public:
 	void waitUntilFinished(int pollTime);
 
 
+	boost::numeric::ublas::matrix<double> convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose);
+	boost::numeric::ublas::matrix<double> convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose, bool use_orthogonalization);
 
+	vector<double> convertPixelToProbe(int x, int y);
 private:
 	boost::shared_ptr<TcpClient> tcp_client_;
 	InverseKinematics inverse_kinematics_;
@@ -69,10 +75,10 @@ private:
 	PathPlanner path_planner_;
 	boost::numeric::ublas::matrix<double> robot_to_cam_transformation_;
 	boost::numeric::ublas::matrix<double> robot_to_needle_transformation_;
+	boost::numeric::ublas::matrix<double> pixel_to_probe_transformation_;
 
 
-	boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose);
-	boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose, bool use_orthogonalization);
+	
 
 
 };
