@@ -41,17 +41,20 @@ IKResult PathPlanner::checkForValidConfigurations(IKResult configs){
 
 	for (int i = 0; i < configs.solutions.size(); i++) {
 		value = 0;
-		for (int j = 0; j < 6; j++) {
-			jointPosition = direct_kinematics_.getPositionOfJoint(j, configs.solutions[i]);
-			//If the z coordinate of the joint is above the table
-			if (jointPosition(2, 3) > 0.05) {
-				value++;
+		if (-180 <= configs.solutions[i].getWrist1Angle() && configs.solutions[i].getWrist1Angle() <= 0){
+			for (int j = 0; j < 6; j++) {
+				jointPosition = direct_kinematics_.getPositionOfJoint(j, configs.solutions[i]);
+				//If the z coordinate of the joint is above the table
+				if (jointPosition(2, 3) > 0.05) {
+					value++;
+				}
+			}
+			if (value == 6){
+				result.solutions.push_back(configs.solutions[i]);
+				result.configuration.push_back(configs.configuration[i]);
 			}
 		}
-		if (value == 6){
-			result.solutions.push_back(configs.solutions[i]);
-			result.configuration.push_back(configs.configuration[i]);
-		}
+		
 	}
 
 	return result;
