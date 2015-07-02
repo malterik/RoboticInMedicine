@@ -35,15 +35,17 @@ std::vector<JointAngles> PathPlanner::checkForValidConfigurations(std::vector<Jo
 
 	for (int i = 0; i < configs.size(); i++) {
 		value = 0;
-		for (int j = 0; j < 6; j++) {
-			jointPosition = direct_kinematics_.getPositionOfJoint(j, configs[i]);
-			//If the z coordinate of the joint is above the table
-			if (jointPosition(2, 3) > 0.05) {
-				value++;
+		if (-180 <= configs[i].getWrist1Angle() && configs[i].getWrist1Angle() <= 0){
+			for (int j = 0; j < 6; j++) {
+				jointPosition = direct_kinematics_.getPositionOfJoint(j, configs[i]);
+				//If the z coordinate of the joint is above the table
+				if (jointPosition(2, 3) > 0.05) {
+					value++;
+				}
 			}
-		}
-		if (value == 6){
-			result.push_back(configs[i]);
+			if (value == 6){
+				result.push_back(configs[i]);
+			}
 		}
 	}
 
