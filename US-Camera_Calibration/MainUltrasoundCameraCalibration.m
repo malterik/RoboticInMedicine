@@ -68,7 +68,7 @@ surf(rmsDistFromMean(4)*x+meanPointsPhantom(1,4),rmsDistFromMean(4)*y+meanPoints
 %% Segmenting Ultrasound images
 
 % read probe poses
-probePoses = importProbePoses('data\ultrasoundImagesAndPoses\probePoses.txt');
+probePoses = importProbePoses('data\ultrasoundImagesAndPoses\fileout_pos.txt');
 
 % take only the measurements with valid pose
 imgMask = (1:20).*(probePoses(:,2)' == 1);
@@ -82,7 +82,12 @@ numImages = size(probePoses,1);
 imgMask = imgMask-1;
 
 % segement the points of the z-wire
-[cc1, cc2, cc3, xmmPerPx, ymmPerPx, allImages] = segmentZPhantomPointsInUSImages('data\ultrasoundImagesAndPoses\fileout_', numImages,imgMask);
+[cc1, cc2, cc3, xmmPerPx, ymmPerPx, allImages, invalid] = segmentZPhantomPointsInUSImages('data\ultrasoundImagesAndPoses\fileout_pos.txt_', numImages,imgMask);
+
+% remove images with invalid segmentation result
+imgMask(invalid) = [];
+numImages = length(imgMask);
+probePoses(invalid,:) = [];
 
 c1 = cc1;
 c2 = cc2;
@@ -147,14 +152,14 @@ end;
 %% Visualize the calibration error
 % Comparing the zMidCamera and zInImageToCamera
 
-%%%% Uncomment the following lines, once you have computed zMidCamera and 
-%%%% zInImageToCamera
 
 hold on; % plot over the last figure
 zMidCompX = [zMidCamera(:,1)'; zInImageToCamera(:,1)'];
 zMidCompY = [zMidCamera(:,2)'; zInImageToCamera(:,2)'];
 zMidCompZ = [zMidCamera(:,3)'; zInImageToCamera(:,3)'];
 plot3(zMidCamera(:,1), zMidCamera(:,2), zMidCamera(:,3), '*')
+text(zMidCamera(:,1), zMidCamera(:,2), zMidCamera(:,3), num2str(imgMask'), 'VerticalAlignment','bottom', ...
+                             'HorizontalAlignment','right')
 plot3(zMidCompX, zMidCompY, zMidCompZ, 'r+-')
 hold off;
 axis equal
@@ -170,3 +175,11 @@ for it = 1:numImages
 end;
 disp(['Mean calibration error in mm: ' num2str(mean(calError))]);
 
+%% storing result
+prompt = 'Do you want to save the transformation? Y/N [N]: ';
+str = input(prompt,'s');
+if strcmpi(str,'y')
+    meter = tfMatImageToProbe;
+    meter(1:3,4) = meter(1:3,4)/1000;
+    csvwrite('data/ImageToProbe.csv',meter);
+end
