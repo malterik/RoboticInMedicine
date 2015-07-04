@@ -4,6 +4,7 @@
 #include "../Math/InvertMatrix.h"
 #define PI boost::math::constants::pi<double>()
 #define AE_INT_T int
+#define SIMULATION_OUTPUT_FOLDER "..\\Output\\"
 
 UR5::UR5() :tcp_client_(new TcpClient)
 {
@@ -17,10 +18,16 @@ boost::numeric::ublas::matrix<double> UR5::getRobotToCamTransformation()
 {
 	return robot_to_cam_transformation_;
 }
+
 boost::numeric::ublas::matrix<double> UR5::getRobotToNeedleTransformation()
 {
 	return robot_to_needle_transformation_;
 }
+
+boost::numeric::ublas::matrix<double> UR5::getPixelToProbeTransformation() {
+	return pixel_to_probe_transformation_;
+}
+
 
 void UR5::setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation)
 {
@@ -30,6 +37,10 @@ void UR5::setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robo
 void UR5::setRobotToNeedleTransformation(boost::numeric::ublas::matrix<double> robot_to_needle_transformation)
 {
 	robot_to_needle_transformation_ = robot_to_needle_transformation;
+}
+
+void UR5::setPixelToProbeTransformation(boost::numeric::ublas::matrix<double> pixel_to_probe_transformation){
+	pixel_to_probe_transformation_ = pixel_to_probe_transformation;
 }
 
 bool UR5::connectToRobot(char* ip, int port){
@@ -77,8 +88,6 @@ JointAngles& UR5::getJoints(char* mode) {
 	return temp;
 	
 }
-
-
 
 void UR5::moveToPosition(double x, double y, double z){
 
@@ -347,7 +356,7 @@ void UR5::moveToPose(matrix<double> endPose) {
 }
 
 matrix<double> UR5::orientateAlongVector(double x, double y, double z){
-	double theta_x, theta_y, theta_z;
+	/*double theta_x, theta_y, theta_z;
 
 	boost::numeric::ublas::vector<double> vector(3);
 
@@ -380,7 +389,47 @@ matrix<double> UR5::orientateAlongVector(double x, double y, double z){
 		yAngle2 -= PI;
 	}
 	
-	return rotateEndEffector((2*PI) - xAngle, yAngle2, 0);
+	return rotateEndEffector((2*PI) - xAngle, yAngle2, 0);*/
+
+
+	// create z unit vector
+	vector<double> e_z(3);
+	e_z <<= 0, 0, 1;
+
+	// create vector containing direction
+	vector<double> direction(3);
+	direction <<= x, y, z;
+	direction /= norm_2(direction);
+
+	// calculate axis angle representation of vector between e_z and direction
+	double angle = acos(inner_prod(e_z, direction));
+	vector<double> axis = MathTools::crossProduct(e_z, direction);
+
+	// convert to rotation matrix
+	matrix<double> rotation = MathTools::convertAxisAngleToRotationMatrix(axis, angle);
+
+	return rotation;
+}
+
+boost::numeric::ublas::vector<double> UR5::convertCamToRobPose(boost::numeric::ublas::vector<double> camPosition)
+{
+	// create 4x4 matrix with given cam position and dummy rotation matrix
+	boost::numeric::ublas::identity_matrix<double> eye(4);
+	boost::numeric::ublas::matrix<double> camPose(eye);
+	camPose(0, 3) = camPosition(0);
+	camPose(1, 3) = camPosition(1);
+	camPose(2, 3) = camPosition(2);
+
+	// transform matrix
+	boost::numeric::ublas::matrix<double> camPose_rob = convertCamToRobPose(camPose, true);
+
+	// reduce result to translation vector
+	boost::numeric::ublas::vector<double> camPosition_rob(3);
+	camPosition_rob(0) = camPose_rob(0, 3);
+	camPosition_rob(1) = camPose_rob(1, 3);
+	camPosition_rob(2) = camPose_rob(2, 3);
+
+	return camPosition_rob;
 }
 
 boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose)
@@ -512,7 +561,6 @@ void UR5::doNeedlePlacement(vector<double> target, vector<double> window, matrix
 	waitUntilFinished(500);
 	moveToPosition(window - 0.2*direction);
 
-
 	//determine the farest pose away from the target that is reachable with the same joint configuration
 	//result = path_planner_.chooseNearest(getJoints("rad"), path_planner_.checkForValidConfigurations(inverse_kinematics_.computeInverseKinematics(pose)));
 	//while (!done) {
@@ -562,9 +610,98 @@ vector<double> UR5::convertPixelToProbe(int x, int y) {
 	return result;
 }
 
-void UR5::setPixelToProbeTransformation(boost::numeric::ublas::matrix<double> pixel_to_probe_transformation){
-	pixel_to_probe_transformation_ = pixel_to_probe_transformation;
+/// <summary>
+/// Places the needle.
+/// </summary>
+/// <param name="target">The target.</param>
+/// <param name="window_center">The window_center.</param>
+/// <param name="log_movement">Movement is logged to CSV files after being complete dif set to <c>true</c> [log_movement].</param>
+void UR5::needlePlacement(vector<double> target, vector<double> window_center, bool log_movement)
+{
+	/* TODO:
+		- Position outside of box has fixed distance from window but should be calculated
+		- Does moveAlongVector move on straight line? It does not look like a straight line in simulator.
+		- Needle needs to be taken into account
+	*/
+	
+	CSVParser csvParser;
+	
+	// CALCULATE POSITIONS OUTSIDE OF BOX 
+	// calculate vector from middle to tumor point
+	vector<double> window_to_target = target - window_center;
+
+	// calculate position outside of box
+	vector<double> outside_point = window_center - 0.3*(window_to_target / norm_2(window_to_target));
+	std::cout << "outside_point: " << outside_point << std::endl;
+
+	// calcuate position outside of box with z offset
+	vector<double> outside_point_z_offset(outside_point);
+	outside_point_z_offset(2) += 0.3;
+	std::cout << "outside_point_z_offset: " << outside_point << std::endl;
+
+
+	// MOVE TO POINTS OUTSIDE OF BOX
+	// move to outside point with z offset
+	matrix<double> outside_z_offset_matrix = moveAndWait(&UR5::moveToPosition, outside_point_z_offset);
+	std::cout << "outside_z_offset_matrix: " << outside_z_offset_matrix << std::endl;
+	if (log_movement)
+	{
+		csvParser.writeHTM(outside_z_offset_matrix, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_outside_z_offset_matrix.csv");
+	}
+
+	// move to outside point
+	matrix<double> outside_matrix = moveAndWait(&UR5::moveToPosition, outside_point);
+	std::cout << "outside_matrix: " << outside_matrix << std::endl;
+	if (log_movement)
+	{
+		csvParser.writeHTM(outside_matrix, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_outside_matrix.csv");
+	}
+
+
+	// ORIENTATE ROBOT THE RIGHT DIRECTION
+	// align with right direction
+	vector<double> dirVector = window_to_target;
+	std::cout << "dirVector: " << dirVector << std::endl;
+	matrix<double> rotation = orientateAlongVector(dirVector(0), dirVector(1), dirVector(2));
+	vector<double> translation = MathTools::getTranslation(outside_matrix);
+	matrix<double> outside_matrix_right_orientation = MathTools::composeMatrix(rotation, translation);
+	std::cout << "outside_matrix_right_orientation prior to movement: " << outside_matrix_right_orientation << std::endl;
+
+	outside_matrix_right_orientation = moveAndWait(&UR5::moveToPose, outside_matrix_right_orientation);
+	std::cout << "outside_matrix_right_orientation after movement: " << outside_matrix_right_orientation << std::endl;
+	if (log_movement)
+	{
+		csvParser.writeHTM(outside_matrix_right_orientation, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_outside_right_orientation_matrix.csv");
+	}
+
+	// MOVE INTO TUMOR ON STRAIGHT LINE
+	vector<double> vec = target - translation;
+	moveAlongVector(vec);
+	waitUntilFinished(500);
+	JointAngles jointAngles = getJoints("rad");
+	DirectKinematics directKinematics;
+	matrix<double> finalMatrix = directKinematics.computeDirectKinematics(jointAngles);
+	std::cout << "outsideRightOrientationMatrix: " << finalMatrix << std::endl;
+	if (log_movement)
+	{
+		csvParser.writeHTM(finalMatrix, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_final_matrix.csv");
+	}
 }
-boost::numeric::ublas::matrix<double> UR5::getPixelToProbeTransformation() {
-	return pixel_to_probe_transformation_;
+
+matrix<double> UR5::moveAndWait(void(UR5::* moveFunction)(vector<double>), vector<double> vec)
+{
+	(this->*moveFunction)(vec);
+	waitUntilFinished(500);
+	JointAngles jointAngles = getJoints("rad");
+	DirectKinematics directKinematics;
+	return directKinematics.computeDirectKinematics(jointAngles);
+}
+
+matrix<double> UR5::moveAndWait(void(UR5::* moveFunction)(matrix<double>), matrix<double> mat)
+{
+	(this->*moveFunction)(mat);
+	waitUntilFinished(500);
+	JointAngles jointAngles = getJoints("rad");
+	DirectKinematics directKinematics;
+	return directKinematics.computeDirectKinematics(jointAngles);
 }
