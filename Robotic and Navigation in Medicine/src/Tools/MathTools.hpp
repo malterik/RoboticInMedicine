@@ -3,6 +3,7 @@
 #include "boost\numeric\ublas\matrix.hpp"
 #include "boost\numeric\ublas\vector.hpp"
 #include "boost\numeric\ublas\assignment.hpp"
+#include "..\Kinematic\JointAngles.h"
 
 using namespace boost::numeric::ublas;
 
@@ -16,5 +17,6 @@ public:
 	static matrix<double> MathTools::getRotation(matrix<double> mat);
 	static matrix<double> MathTools::setRotation(matrix<double> mat, matrix<double> rotation);
 	static matrix<double> MathTools::setTranslation(matrix<double> mat, vector<double> translation);
+	static double MathTools::getChangeInRotation(JointAngles a, JointAngles b);
 };
 

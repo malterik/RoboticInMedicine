@@ -125,3 +125,15 @@ matrix<double> MathTools::setTranslation(matrix<double> mat, vector<double> tran
 
 	return newMat;
 }
+
+double MathTools::getChangeInRotation(JointAngles a, JointAngles b)
+{
+	double sum_of_rotations = 0.0;
+
+	for (int i = 0; i < a.size(); i++)
+	{
+		sum_of_rotations += abs(a[i] - b[i]);
+	}
+
+	return sum_of_rotations;
+}
