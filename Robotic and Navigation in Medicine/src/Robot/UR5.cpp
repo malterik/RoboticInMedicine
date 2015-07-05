@@ -756,7 +756,7 @@ bool UR5::needlePlacement(vector<double> target, vector<double> window_center, b
 
 		double step_size = 0.005; // stepsize in m
 		double min_distance = 0.05; // minimum distance from window to needle for outside position
-		double max_distance = 0.5; // distance does not need to be further than this 
+		double max_distance = 0.1; // distance does not need to be further than this 
 
 		vector<double> direction = (-window_to_target) / norm_2(window_to_target);	// normed vector from window center pointing away from target
 		matrix<double> rot = orientateAlongVector(window_to_target); // desired needle rotation for outside pose
@@ -797,6 +797,7 @@ bool UR5::needlePlacement(vector<double> target, vector<double> window_center, b
 			
 
 	// STEP 1: MOVE TO POSE OUTSIDE OF BOX
+		std::cout << "outside_pose_pre: " << outside_pose << std::endl;
 		success = moveAndWait(&UR5::moveToPose, outside_pose, outside_pose);
 		if (!success)
 		{
@@ -806,13 +807,19 @@ bool UR5::needlePlacement(vector<double> target, vector<double> window_center, b
 		{
 			csvParser.writeHTM(outside_pose, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_outside_matrix.csv");
 		}
-
+		std::cout << "outside_pose: " << outside_pose << std::endl;
 
 	// STEP 2: MOVE INTO TUMOR ON STRAIGHT LINE
 		matrix<double> finalMatrix(4, 4);
 
 		// actual movement
-		success = moveAndWait(&UR5::moveLinear, convertNeedleToRobPose(MathTools::composeMatrix(MathTools::getRotation(getNeedlePose()), target)), finalMatrix);
+		matrix<double> finalPosePre = convertNeedleToRobPose(MathTools::composeMatrix(MathTools::getRotation(getNeedlePose()), target));
+		std::cout << "finalPosePre: " << finalPosePre << std::endl;
+		if (log_movement)
+		{
+			csvParser.writeHTM(finalPosePre, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_final_matrix_pre.csv");
+		}
+		success = moveAndWait(&UR5::moveLinear, finalPosePre, finalMatrix);
 		if (!success)
 		{
 			return false;

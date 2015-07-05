@@ -17,8 +17,8 @@
     hold off;
     
             
-    xStart = [0.8 0 0.1];
-    yStart = [0 0.8 0.1]
+    xStart = [0.4 0 0.2];
+    yStart = [0 0.9 0.2]
     diff = (yStart-xStart);
     
 %     figure(simFig);
@@ -27,20 +27,20 @@
 %     hold off;
 %     
 
-%%% Create new coordinates
-%     windowPointTranslations_rob(1,:) = xStart+diff*0.3;
-%     windowPointTranslations_rob(2,:) = xStart+diff*0.7;
-%     windowPointTranslations_rob(3,:) = windowPointTranslations_rob(2,:) + [0 0 0.1];
-%     windowPointTranslations_rob(4,:) = windowPointTranslations_rob(1,:) + [0 0 0.1];
-%     
-%     windowPointsHTM_cam = zeros(4,4,size(windowPointTranslations_rob,1));
-%     windowPoints= zeros(size(windowPointTranslations_rob,1), 3);
-%     for i = 1:size(windowPoints,1);
-%         windowPointsHTM_cam(:,:,i) = [eye(3) windowPointTranslations_rob(i,:)'; 0 0 0 1];
-%         windowPointsHTM_cam(:,:,i) = inv(Y)*windowPointsHTM_cam(:,:,i);
-%         windowPointsHTM_cam(:,:,i) = orth(windowPointsHTM_cam(:,:,i));
-%         windowPoints(i,:) = windowPointsHTM_cam(1:3,4,i);
-%     end
+%% Create new coordinates
+    windowPointTranslations_rob(1,:) = xStart+diff*0.4;
+    windowPointTranslations_rob(2,:) = xStart+diff*0.6;
+    windowPointTranslations_rob(3,:) = windowPointTranslations_rob(2,:) + [0 0 0.1];
+    windowPointTranslations_rob(4,:) = windowPointTranslations_rob(1,:) + [0 0 0.1];
+    
+    windowPointsHTM_cam = zeros(4,4,size(windowPointTranslations_rob,1));
+    windowPoints= zeros(size(windowPointTranslations_rob,1), 3);
+    for i = 1:size(windowPoints,1);
+        windowPointsHTM_cam(:,:,i) = [eye(3) windowPointTranslations_rob(i,:)'; 0 0 0 1];
+        windowPointsHTM_cam(:,:,i) = inv(Y)*windowPointsHTM_cam(:,:,i);
+        windowPointsHTM_cam(:,:,i) = orth(windowPointsHTM_cam(:,:,i));
+        windowPoints(i,:) = windowPointsHTM_cam(1:3,4,i);
+    end
     
     
     
@@ -119,17 +119,21 @@
 %     plotHTM(outside_z_offset_pose, simFig, 0.04);
 %     plotNeedle(outside_z_offset_pose, rob2needle, simFig);
 %     
-%     outside_pose = csvread('Output/sim_outside_matrix.csv');
-%     plotHTM(outside_pose, simFig, 0.04);
-%     plotNeedle(outside_pose, rob2needle, simFig);
+    outside_pose = csvread('Output/sim_outside_matrix.csv');
+    plotHTM(outside_pose, simFig, 0.04);
+    plotNeedle(outside_pose, rob2needle, simFig);
 % 
 % %     outside_right_orientaion_pose = csvread('Output/sim_outside_right_orientation_matrix.csv');
 % %     plotHTM(outside_right_orientaion_pose, simFig, 0.04);
 % %     plotNeedle(outside_right_orientaion_pose, rob2needle, simFig);
 % 
-%     final_pose = csvread('Output/sim_final_matrix.csv');
-%     plotHTM(final_pose, simFig, 0.04);
-%     plotNeedle(final_pose, rob2needle, simFig);
+    final_pose_pre = csvread('Output/sim_final_matrix_pre.csv');
+    plotHTM(final_pose_pre, simFig, 0.04);
+    plotNeedle(final_pose_pre, rob2needle, simFig);
+
+    final_pose = csvread('Output/sim_final_matrix.csv');
+    plotHTM(final_pose, simFig, 0.04);
+    plotNeedle(final_pose, rob2needle, simFig);
     
 %     f_pose = [0.104574 -0.056659 -0.992898 -0.544405; -0.799387 0.589151 -0.117811 -0.133997; 0.591650 0.806031 0.016318 0.166563; 0 0 0 1];
 %     plotNeedle(f_pose, rob2needle, simFig);

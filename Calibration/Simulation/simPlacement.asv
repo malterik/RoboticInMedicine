@@ -8,23 +8,39 @@
     load('Calibration/Data/handEyeData.mat');
     rob2needle = csvread('Input/rob2needle.csv');
     %windowPoints = csvread('Input/windowPoints.csv');
-    windowPoints = csvread('Input/Copy_of_windowPoints.csv'); 
-    
-    x_offset = -0.5;
-    y_offset = 0.0;
-    
-    windowPoints(1,2) = windowPoints(1,2) + y_offset;
-    windowPoints(2,2) = windowPoints(2,2) + y_offset;
-    windowPoints(3,2) = windowPoints(3,2) + y_offset;
-    windowPoints(4,2) = windowPoints(4,2) + y_offset;
-        
-    windowPoints(1,1) = windowPoints(1,1) + x_offset;
-    windowPoints(2,1) = windowPoints(2,1) + x_offset;
-    windowPoints(3,1) = windowPoints(3,1) + x_offset;
-    windowPoints(4,1) = windowPoints(4,1) + x_offset;
+    windowPoints = csvread('Input/windowPoints_backup.csv'); 
     
     % create figure;
     simFig = figure(1);
+    hold on;
+    grid on;
+    hold off;
+    
+            
+    xStart = [0.7 0 0.1];
+    yStart = [0 0.7 0.1]
+    diff = (yStart-xStart);
+    
+    figure(simFig);
+    hold on;
+    plot3([xStart(1) yStart(1)], [xStart(2) yStart(2)], [xStart(3) yStart(3)], 'k-');
+    hold off;
+    
+    windowPointTranslations_rob(1,:) = xStart+diff*0.3;
+    windowPointTranslations_rob(2,:) = xStart+diff*0.7;
+    windowPointTranslations_rob(3,:) = windowPointTranslations_rob(2,:) + [0 0 0.1];
+    windowPointTranslations_rob(4,:) = windowPointTranslations_rob(1,:) + [0 0 0.1];
+    
+    windowPointsHTM_cam = zeros(4,4,size(windowPointTranslations_rob,1));
+    windowPoints= zeros(size(windowPointTranslations_rob,1), 3);
+    for i = 1:size(windowPoints,1);
+        windowPointsHTM_cam(:,:,i) =  [eye(3) windowPointTranslations_rob(i,:)'; 0 0 0 1];
+        windowPointsHTM_cam(:,:,i) = convertCamToRob(Y,windowPointsHTM_rob(:,:,i));
+        windowPointsHTM_cam(:,:,i) = convertCamToRob(Y,windowPointsHTM_rob(:,:,i));
+        windowPoints(i,:) = windowPointsHTM_cam(1:3,4,i);
+    end
+    
+    
     
 %% Create tumor
     
@@ -34,7 +50,7 @@
     C = fitNormal(data);
     C_norm = C/norm(C);
     windowMiddle = mean(windowPoints);
-    tumorPoint = windowMiddle' + distance*C_norm;
+    tumorPoint = windowMiddle' - distance*C_norm;
     
 %% Create window
     % Transform window coordinates to rob world
@@ -45,18 +61,19 @@
         windowPointsHTM_rob(:,:,i) = convertCamToRob(Y,windowPointsHTM_rob(:,:,i));
         windowPointTranslations_rob(i,:) = windowPointsHTM_rob(1:3,4,i);
     end
+
     
-    windowPointTranslations_rob(1,:) = [0.4 0.5 0.1];
-    windowPointTranslations_rob(2,:) = [0.5 0.5 0.1];
-    windowPointTranslations_rob(3,:) = [0.4 0.5 0.1];
-    windowPointTranslations_rob(4,:) = [0.5 0.5 0.1];
+%     windowPointTranslations_rob(1,:) = [0.25 0.3 0.1];
+%     windowPointTranslations_rob(3,:) = [0.25 0.4 0.2];
+%     windowPointTranslations_rob(2,:) = [0.3 0.4 0.1];
+%     windowPointTranslations_rob(4,:) = [0.4 0.3 0.2];
     
     % Calculate middle of window in rob world
     windowMiddle_rob = mean(windowPointTranslations_rob);
     
     % add window to plot
     figure(simFig);
-    hold on;
+    hold on;    
     plot3(windowPointTranslations_rob(:,1), windowPointTranslations_rob(:,2), windowPointTranslations_rob(:,3), 'ro');
     plot3(windowMiddle_rob(1), windowMiddle_rob(2), windowMiddle_rob(3), 'rx', 'MarkerSize', 25);
     fill3(windowPointTranslations_rob(:,1), windowPointTranslations_rob(:,2), windowPointTranslations_rob(:,3), 'r');
