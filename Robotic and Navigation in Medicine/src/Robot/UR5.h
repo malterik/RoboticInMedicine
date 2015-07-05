@@ -30,49 +30,55 @@ public:
 	UR5();
 	~UR5();
 
-	boost::numeric::ublas::matrix<double> getRobotToCamTransformation();
-	boost::numeric::ublas::matrix<double> getRobotToNeedleTransformation();
-	boost::numeric::ublas::matrix<double> getPixelToProbeTransformation();
-
-	void setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation);
-	void setRobotToNeedleTransformation(boost::numeric::ublas::matrix<double> robot_to_needle_transformation_);
-	void setPixelToProbeTransformation(boost::numeric::ublas::matrix<double> pixel_to_probe_transformation);
-
-	bool connectToRobot(char* ip, int port);
-	bool setJoints(JointAngles angles);
+	matrix<double> getRobotToCamTransformation();
+	matrix<double> getRobotToNeedleTransformation();
+	matrix<double> getPixelToProbeTransformation();
+	matrix<double> getEndEffectorPose();
+	matrix<double> getNeedlePose();
 	JointAngles& getJoints(char* mode);
-	/**
-	* This Moves the endeffector to the given Position (leaves the orientation untouched
-	*
-	*/
-	void moveToPosition(double x, double y, double z);
-	void moveToPosition(vector<double> vec);
-	void moveToPose(double x, double y, double z, double theta_x, double theta_y, double theta_z);
-	void moveToPose(matrix<double> endPose);
-	matrix<double> UR5::moveAndWait(void(UR5::* moveFunction)(vector<double>), vector<double> vec);
-	matrix<double> UR5::moveAndWait(void(UR5::* moveFunction)(matrix<double>), matrix<double> mat);
+
+	void setRobotToCamTransformation(matrix<double> robot_to_cam_transformation);
+	void setRobotToNeedleTransformation(matrix<double> robot_to_needle_transformation_);
+	void setPixelToProbeTransformation(matrix<double> pixel_to_probe_transformation);
+	
+	bool setJoints(JointAngles angles);
+	bool setSpeed(double speedValue);
+	bool enableLinearMovement();
+	bool disableLinearMovement();
+	bool connectToRobot(char* ip, int port);
+
+	bool moveToPosition(vector<double> vec);
+	bool moveToPosition(double x, double y, double z);	
+	bool moveToPose(double x, double y, double z, double theta_x, double theta_y, double theta_z);
+	bool moveToPose(matrix<double> endPose);
+	bool moveLinear(matrix<double> pose);
+	bool moveAlongVector(vector<double> vec);
+	bool moveAlongVector(double x, double y, double z);
+	bool moveToHomePosition();
+	bool UR5::moveAndWait(bool(UR5::* moveFunction)(vector<double>), vector<double> vec, matrix<double> &outMatrix);
+	bool UR5::moveAndWait(bool(UR5::* moveFunction)(matrix<double>), matrix<double> mat, matrix<double> &outMatrix);
 
 	//Keep the position and rotate the effector by the given angles
-	matrix<double> rotateEndEffector(double theta_x, double theta_y, double theta_z);
-
-	matrix<double> moveAlongVector(double x, double y, double z);
-	matrix<double> moveAlongVector(vector<double> vec);
-
+	bool rotateEndEffector(double theta_x, double theta_y, double theta_z);
 	matrix<double> orientateAlongVector(double x, double y, double z);
 	matrix<double> orientateAlongVector(vector<double> vec);
 
-	void doNeedlePlacement(vector<double> target, vector<double> window, matrix<double> needleTip);
-	void needlePlacement(vector<double> target, vector<double> window_center, bool log_movement);
 
-	void setSpeed(double speedValue);
-	void moveToHomePosition();
+
+
+	void doNeedlePlacement(vector<double> target, vector<double> window, matrix<double> needleTip);
+	bool needlePlacement(vector<double> target, vector<double> window_center, bool log_movement);
+
+	
 	void waitUntilFinished(int pollTime);
 
+	bool checkCommandSuccess(const char* server_answer);
 
-	boost::numeric::ublas::matrix<double> convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose);
-	boost::numeric::ublas::matrix<double> convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose, bool use_orthogonalization);
-	boost::numeric::ublas::vector<double> convertCamToRobPose(boost::numeric::ublas::vector<double> camPosition);
 
+	matrix<double> convertCamToRobPose(matrix<double> camPose);
+	matrix<double> convertCamToRobPose(matrix<double> camPose, bool use_orthogonalization);
+	vector<double> convertCamToRobPose(vector<double> camPosition);
+	matrix<double> UR5::convertNeedleToRobPose(matrix<double> needlePose);
 	vector<double> convertPixelToProbe(int x, int y);
 
 
@@ -82,7 +88,7 @@ private:
 	InverseKinematics inverse_kinematics_;
 	DirectKinematics direct_kinematics_;
 	PathPlanner path_planner_;
-	boost::numeric::ublas::matrix<double> robot_to_cam_transformation_;
-	boost::numeric::ublas::matrix<double> robot_to_needle_transformation_;
-	boost::numeric::ublas::matrix<double> pixel_to_probe_transformation_;
+	matrix<double> robot_to_cam_transformation_;
+	matrix<double> robot_to_needle_transformation_;
+	matrix<double> pixel_to_probe_transformation_;
 };

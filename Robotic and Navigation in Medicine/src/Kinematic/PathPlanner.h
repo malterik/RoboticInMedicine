@@ -8,7 +8,7 @@ class PathPlanner
 {
 public:
 	PathPlanner();
-	IKResult chooseNearest(JointAngles currentAngles, IKResult configs);
+	IKResult* chooseNearest(JointAngles currentAngles, IKResult configs);
 	IKResult checkForValidConfigurations(IKResult configs);
 	void doNeedlePlacement(vector<double> target,vector<double> window,matrix<double> needleTip);
 

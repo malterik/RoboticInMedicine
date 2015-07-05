@@ -1,12 +1,13 @@
 #include "PathPlanner.h"
-
-
 #include <iostream>
+#include <boost/math/constants/constants.hpp>
+#define PI boost::math::constants::pi<double>()
+
 PathPlanner::PathPlanner(){
 
 }
 
-IKResult PathPlanner::chooseNearest(JointAngles currentAngles, IKResult configs){
+IKResult* PathPlanner::chooseNearest(JointAngles currentAngles, IKResult configs){
 	// JointAngles result;
 	IKResult res;
 
@@ -14,7 +15,7 @@ IKResult PathPlanner::chooseNearest(JointAngles currentAngles, IKResult configs)
 	if (configs.configuration.empty()) {
 		std::cout << "No Solution found!" << std::endl;
 		res.nearestSolution = currentAngles;
-		return res;
+		return NULL;
 	}
 
 	minDist = std::numeric_limits<double>::max();
@@ -30,7 +31,7 @@ IKResult PathPlanner::chooseNearest(JointAngles currentAngles, IKResult configs)
 		}
 	}
 	std::cout << "Pathplanner decided for Path " << temp << std::endl;
-	return res;
+	return &res;
 }
 
 IKResult PathPlanner::checkForValidConfigurations(IKResult configs){
@@ -39,9 +40,14 @@ IKResult PathPlanner::checkForValidConfigurations(IKResult configs){
 	matrix<double> jointPosition(4, 4);
 	int value = 0;
 
+	double maxWrist2Angle = 90 * (PI / 180);
+	double minWrist2Angle = -maxWrist2Angle;
+
 	for (int i = 0; i < configs.solutions.size(); i++) {
 		value = 0;
-		if (-180 <= configs.solutions[i].getWrist1Angle() && configs.solutions[i].getWrist1Angle() <= 0){
+		std::cout << configs.solutions[i].getWrist1Angle() << std::endl;
+
+		if (-180 <= configs.solutions[i].getWrist1Angle() && configs.solutions[i].getWrist1Angle() <= 0 /*&& minWrist2Angle <= configs.solutions[i].getWrist2Angle() && configs.solutions[i].getWrist2Angle() <= maxWrist2Angle*/){
 			for (int j = 0; j < 6; j++) {
 				jointPosition = direct_kinematics_.getPositionOfJoint(j, configs.solutions[i]);
 				//If the z coordinate of the joint is above the table

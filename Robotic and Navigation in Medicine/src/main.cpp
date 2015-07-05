@@ -24,7 +24,7 @@
 #define INPUT_FOLDER "..\\Input\\"
 
 int main(int argc, char* argv[])
-{
+{	
 	// READ FILES
 	CSVParser csvParser;
 	boost::numeric::ublas::matrix<double> robot_to_cam_transformation = csvParser.readHTM(std::string(INPUT_FOLDER) + "rob2cam.csv");
@@ -38,10 +38,13 @@ int main(int argc, char* argv[])
 	// INITIALIZE ROBOT
 	UR5 robot;
 	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
-	robot.setSpeed(10);
+	robot.setSpeed(50);
+	robot.disableLinearMovement();
 	robot.setRobotToCamTransformation(robot_to_cam_transformation);
 	robot.setRobotToNeedleTransformation(robot_to_needle_transformation);
 	robot.setPixelToProbeTransformation(pixel_to_probe);
+	robot.moveToHomePosition();
+	robot.waitUntilFinished(500);
 
 	// PREPARE DATA FOR NEEDLE PLACEMENT (i.e calculate target and window center in robot coordinates)
 	// transform tumor coordinates from camera to robot world

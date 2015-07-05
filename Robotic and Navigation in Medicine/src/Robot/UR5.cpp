@@ -8,60 +8,24 @@
 
 UR5::UR5() :tcp_client_(new TcpClient)
 {
-	robot_to_cam_transformation_ = boost::numeric::ublas::matrix<double>(4,4);
-	robot_to_needle_transformation_ = boost::numeric::ublas::matrix<double>(4, 4);
+	robot_to_cam_transformation_ = matrix<double>(4,4);
+	robot_to_needle_transformation_ = matrix<double>(4, 4);
 }
 
 UR5::~UR5(){}
 
-boost::numeric::ublas::matrix<double> UR5::getRobotToCamTransformation()
+matrix<double> UR5::getRobotToCamTransformation()
 {
 	return robot_to_cam_transformation_;
 }
 
-boost::numeric::ublas::matrix<double> UR5::getRobotToNeedleTransformation()
+matrix<double> UR5::getRobotToNeedleTransformation()
 {
 	return robot_to_needle_transformation_;
 }
 
-boost::numeric::ublas::matrix<double> UR5::getPixelToProbeTransformation() {
+matrix<double> UR5::getPixelToProbeTransformation() {
 	return pixel_to_probe_transformation_;
-}
-
-
-void UR5::setRobotToCamTransformation(boost::numeric::ublas::matrix<double> robot_to_cam_transformation)
-{
-	robot_to_cam_transformation_ = robot_to_cam_transformation;
-}
-
-void UR5::setRobotToNeedleTransformation(boost::numeric::ublas::matrix<double> robot_to_needle_transformation)
-{
-	robot_to_needle_transformation_ = robot_to_needle_transformation;
-}
-
-void UR5::setPixelToProbeTransformation(boost::numeric::ublas::matrix<double> pixel_to_probe_transformation){
-	pixel_to_probe_transformation_ = pixel_to_probe_transformation;
-}
-
-bool UR5::connectToRobot(char* ip, int port){
-	tcp_client_->connect(ip, port);
-	std::cout << tcp_client_->read() << std::endl;
-	std::cout << tcp_client_->command("Hello Robot") << std::endl;
-	
-
-	//todo return if connection is established or not
-	return true;
-}
-
-bool UR5::setJoints(JointAngles angles) {
-	char jointString[100];
-
-	sprintf(jointString, "MovePTPJoints %f %f %f %f %f %f ", angles[0] * (180 / PI), angles[1] * (180 / PI), angles[2] * (180 / PI), angles[3] * (180 / PI), angles[4] * (180 / PI), angles[5] * (180 / PI));
-	std::cout << tcp_client_->command(jointString) << std::endl;
-	std::cout << jointString << std::endl;
-	//todo return if transmission was successfull or not
-	return true;
-
 }
 
 JointAngles& UR5::getJoints(char* mode) {
@@ -69,13 +33,13 @@ JointAngles& UR5::getJoints(char* mode) {
 	double test = 1;
 	const char* jointString;
 	jointString = tcp_client_->command("GetPositionJoints");
-	std::cout <<"string: " << jointString << std::endl;
+	std::cout << "string: " << jointString << std::endl;
 	sscanf(jointString, "%lf %lf %lf %lf %lf %lf", &ret[0], &ret[1], &ret[2], &ret[3], &ret[4], &ret[5]);
-	
+
 	if (mode == "deg") {
 		//nothing to do because the values are already in degree	
 	}
-	else if(mode == "rad") {
+	else if (mode == "rad") {
 		//convert to radians
 		for (unsigned int i = 0; i < ret.size(); i++) {
 			ret[i] = ret[i] * (PI / 180);
@@ -86,17 +50,53 @@ JointAngles& UR5::getJoints(char* mode) {
 	}
 	JointAngles temp(ret);
 	return temp;
-	
 }
 
-void UR5::moveToPosition(double x, double y, double z){
+
+void UR5::setRobotToCamTransformation(matrix<double> robot_to_cam_transformation)
+{
+	robot_to_cam_transformation_ = robot_to_cam_transformation;
+}
+
+void UR5::setRobotToNeedleTransformation(matrix<double> robot_to_needle_transformation)
+{
+	robot_to_needle_transformation_ = robot_to_needle_transformation;
+}
+
+void UR5::setPixelToProbeTransformation(matrix<double> pixel_to_probe_transformation){
+	pixel_to_probe_transformation_ = pixel_to_probe_transformation;
+}
+
+bool UR5::setJoints(JointAngles angles) {
+	char commandString[100];
+
+	sprintf(commandString, "MovePTPJoints %f %f %f %f %f %f ", angles[0] * (180 / PI), angles[1] * (180 / PI), angles[2] * (180 / PI), angles[3] * (180 / PI), angles[4] * (180 / PI), angles[5] * (180 / PI));
+	std::cout << commandString << std::endl;
+
+	return checkCommandSuccess(tcp_client_->command(commandString));
+}
+
+bool UR5::connectToRobot(char* ip, int port){
+	tcp_client_->connect(ip, port);
+	std::cout << tcp_client_->read() << std::endl;
+	std::cout << tcp_client_->command("Hello Robot") << std::endl;
+
+	//todo return if connection is established or not
+	return true;
+}
+
+
+
+bool UR5::moveToPosition(vector<double> vec){
+	return moveToPosition(vec[0], vec[1], vec[2]);
+}
+
+bool UR5::moveToPosition(double x, double y, double z){
 
 	matrix<double> endPose(4, 4);
 	matrix<double> currentPose(4, 4);
 	IKResult endPoseJoints;
 	JointAngles currentAngles;
-
-
 
 	currentAngles = getJoints("rad");
 	currentPose = direct_kinematics_.computeDirectKinematics(currentAngles);
@@ -106,161 +106,19 @@ void UR5::moveToPosition(double x, double y, double z){
 	endPose(1, 3) = y;
 	endPose(2, 3) = z;
 	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
+
 	if (endPoseJoints.solutions.size() > 0) {
-		setJoints(path_planner_.chooseNearest(currentAngles,path_planner_.checkForValidConfigurations(endPoseJoints)).nearestSolution); 
-	}
-	else{
-		std::cout << "Error: No IK Solution Found" << std::endl;
-	}
-	
-
-
-}
-
-matrix<double> UR5::rotateEndEffector(double theta_x, double theta_y, double theta_z) {
-	matrix<double> rotX(3, 3);
-	matrix<double> rotY(3, 3);
-	matrix<double> rotZ(3, 3);
-	matrix<double> endOrientation(3, 3);
-	matrix<double> endPose(4, 4);
-	matrix<double> currentPose(4, 4);
-	IKResult endPoseJoints;
-	JointAngles currentAngles;
-
-	currentAngles = getJoints("rad");
-	currentPose = direct_kinematics_.computeDirectKinematics(currentAngles);
-	//fill rotX
-	rotX(0, 0) = 1;
-	rotX(0, 1) = 0;
-	rotX(0, 2) = 0;
-
-	rotX(1, 0) = 0;
-	rotX(1, 1) = cos(theta_x);
-	rotX(1, 2) = -sin(theta_x);
-	
-	rotX(2, 0) = 0;
-	rotX(2, 1) = sin(theta_x);
-	rotX(2, 2) = cos(theta_x);
-
-	//fill rotY
-	rotY(0, 0) = cos(theta_y);
-	rotY(0, 1) = 0;
-	rotY(0, 2) = sin(theta_y);
-
-	rotY(1, 0) = 0;
-	rotY(1, 1) = 1;
-	rotY(1, 2) = 0;
-
-	rotY(2, 0) = -sin(theta_y);
-	rotY(2, 1) = 0;
-	rotY(2, 2) = cos(theta_y);
-
-	//fill rotZ
-	rotZ(0, 0) = cos(theta_z);
-	rotZ(0, 1) = -sin(theta_z);
-	rotZ(0, 2) = 0;
-
-	rotZ(1, 0) = sin(theta_z);
-	rotZ(1, 1) = cos(theta_z);
-	rotZ(1, 2) = 0;
-
-	rotZ(2, 0) = 0;
-	rotZ(2, 1) = 0;
-	rotZ(2, 2) = 1;
-
-	matrix<double> temp(3, 3);
-	temp = prod(rotX, rotY);
-	endOrientation = prod(temp, rotZ);
-
-	
-	//Keep the current position
-	endPose = currentPose;
-	//put the orientation matrix into the endPose
-	for (int i = 0; i < 3; i++) {
-		for (int j = 0; j < 3; j++) {
-			endPose(i, j) = endOrientation(i, j);
+		IKResult* result = path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints));
+		if (result)
+		{
+			return setJoints(result->nearestSolution);
 		}
 	}
 
-	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
-
-	if (endPoseJoints.solutions.size() > 0) {
-		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)).nearestSolution);
-	}
-	else{
-		std::cout << "Error: No IK Solution Found" << std::endl;
-	}
-	return endPose;
-	
+	return false;
 }
 
-matrix<double> UR5::moveAlongVector(double x, double y, double z) {
-	matrix<double> currentPose(4, 4);
-	matrix<double> endPose(4, 4);
-	IKResult endPoseJoints;
-	JointAngles currentAngles;
-	currentAngles = getJoints("rad");
-	currentPose = direct_kinematics_.computeDirectKinematics(currentAngles);
-
-	endPose = currentPose;
-	endPose(0, 3) += x;
-	endPose(1, 3) += y;
-	endPose(2, 3) += z;
-
-	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
-
-	if (endPoseJoints.solutions.size() > 0) {
-		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)).nearestSolution);
-	}
-	else{
-		std::cout << "Error: No IK Solution Found" << std::endl;
-	}
-	return endPose;
-}
-
-void UR5::moveToHomePosition(){
-	JointAngles homePos;
-
-	setJoints(homePos);
-}
-
-/// <summary>
-/// Waits the until robot has finished movement.
-/// </summary>
-/// <remarks>
-/// The robot movement is finished when no commands are left in its queue. Therefore the method waits for an empty queue.
-/// </remarks>
-/// <param name="pollTime">The poll time.</param>
-void UR5::waitUntilFinished(int pollTime){
-	std::string respString;
-	std::string respString_old;
-	int queueLength = INT_MAX;
-	bool finished = false;
-
-	// get queue length until queue is empty
-	while (!finished)
-	{
-		respString = std::string(tcp_client_->command("GetPositionJoints"));
-		if (respString.compare(respString_old) != 0) {
-			respString_old = respString;
-			std::this_thread::sleep_for(std::chrono::milliseconds(pollTime));
-			continue;			
-		}
-		else {
-			finished = true;
-			std::cout << "Finished" << std::endl;
-		}
-	}
-}
-
-void UR5::setSpeed(double speedValue) {
-	char jointString[100];
-
-	sprintf(jointString, "SetSpeed %lf ",speedValue);
-	std::cout << tcp_client_->command(jointString) << std::endl;
-}
-
-void UR5::moveToPose(double x, double y, double z, double theta_x, double theta_y, double theta_z) {
+bool UR5::moveToPose(double x, double y, double z, double theta_x, double theta_y, double theta_z) {
 	matrix<double> rotX(3, 3);
 	matrix<double> rotY(3, 3);
 	matrix<double> rotZ(3, 3);
@@ -332,69 +190,316 @@ void UR5::moveToPose(double x, double y, double z, double theta_x, double theta_
 
 	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
 	if (endPoseJoints.solutions.size() > 0) {
-		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)).nearestSolution);
-	}
-	else{
-		std::cout << "Error: No IK Solution Found" << std::endl;
+		IKResult* result = path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints));
+		if (result)
+		{
+			return setJoints(result->nearestSolution);
+		}
 	}
 
-
+	return false;
 }
 
-void UR5::moveToPose(matrix<double> endPose) {
+bool UR5::moveToPose(matrix<double> endPose) {
 	IKResult endPoseJoints;
 	JointAngles currentAngles;
 
 	currentAngles = getJoints("rad");
 	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
 	if (endPoseJoints.solutions.size() > 0) {
-		setJoints(path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints)).nearestSolution);
+		IKResult* result = path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints));
+		if (result)
+		{
+			return setJoints(result->nearestSolution);
+		}
 	}
-	else{
-		std::cout << "Error: No IK Solution Found" << std::endl;
+
+	return false;
+}
+
+bool UR5::moveAlongVector(vector<double> vec){
+	return moveAlongVector(vec[0], vec[1], vec[2]);
+}
+
+bool UR5::moveAlongVector(double x, double y, double z) {
+	matrix<double> currentPose(4, 4);
+	matrix<double> endPose(4, 4);
+	IKResult endPoseJoints;
+	JointAngles currentAngles;
+	currentAngles = getJoints("rad");
+	currentPose = direct_kinematics_.computeDirectKinematics(currentAngles);
+
+	endPose = currentPose;
+	endPose(0, 3) += x;
+	endPose(1, 3) += y;
+	endPose(2, 3) += z;
+
+	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
+
+	if (endPoseJoints.solutions.size() > 0) {
+		IKResult* result = path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints));
+		if (result)
+		{
+			return setJoints(result->nearestSolution);
+		}
+	}
+
+	return false;
+}
+
+bool UR5::moveLinear(matrix<double> pose)
+{
+	InverseKinematics inverseKinematics;
+	IKResult ikResult = inverseKinematics.computeInverseKinematics(pose);
+	JointAngles angles;
+
+	if (ikResult.solutions.size() > 0) {
+		IKResult* result = path_planner_.chooseNearest(getJoints("rad"), path_planner_.checkForValidConfigurations(ikResult));
+		if (result)
+		{
+			angles = result->nearestSolution;
+			char commandString[100];
+			sprintf(commandString, "MoveLINJoints %f %f %f %f %f %f ", angles[0] * (180 / PI), angles[1] * (180 / PI), angles[2] * (180 / PI), angles[3] * (180 / PI), angles[4] * (180 / PI), angles[5] * (180 / PI));
+			std::cout << commandString << std::endl;
+
+			enableLinearMovement();
+			bool success = checkCommandSuccess(tcp_client_->command(commandString));
+			disableLinearMovement();
+
+			return success;
+		}
+	}
+
+	return false;
+}
+
+bool UR5::moveToHomePosition(){
+	JointAngles homePos;
+
+	return setJoints(homePos);
+}
+
+bool UR5::moveAndWait(bool(UR5::* moveFunction)(vector<double>), vector<double> vec, matrix<double> &outMatrix)
+{
+	if ((this->*moveFunction)(vec))
+	{
+		waitUntilFinished(500);
+		JointAngles jointAngles = getJoints("rad");
+		DirectKinematics directKinematics;
+		outMatrix = directKinematics.computeDirectKinematics(jointAngles);
+		return true;
+	}
+
+	return false;
+}
+
+bool UR5::moveAndWait(bool(UR5::* moveFunction)(matrix<double>), matrix<double> mat, matrix<double> &outMatrix)
+{
+	if ((this->*moveFunction)(mat))
+	{
+		waitUntilFinished(500);
+		JointAngles jointAngles = getJoints("rad");
+		DirectKinematics directKinematics;
+		outMatrix = directKinematics.computeDirectKinematics(jointAngles);
+		std::cout << outMatrix << std::endl;
+		return true;
+	}
+
+	return false;
+}
+
+bool UR5::rotateEndEffector(double theta_x, double theta_y, double theta_z) {
+	matrix<double> rotX(3, 3);
+	matrix<double> rotY(3, 3);
+	matrix<double> rotZ(3, 3);
+	matrix<double> endOrientation(3, 3);
+	matrix<double> endPose(4, 4);
+	matrix<double> currentPose(4, 4);
+	IKResult endPoseJoints;
+	JointAngles currentAngles;
+
+	currentAngles = getJoints("rad");
+	currentPose = direct_kinematics_.computeDirectKinematics(currentAngles);
+	//fill rotX
+	rotX(0, 0) = 1;
+	rotX(0, 1) = 0;
+	rotX(0, 2) = 0;
+
+	rotX(1, 0) = 0;
+	rotX(1, 1) = cos(theta_x);
+	rotX(1, 2) = -sin(theta_x);
+
+	rotX(2, 0) = 0;
+	rotX(2, 1) = sin(theta_x);
+	rotX(2, 2) = cos(theta_x);
+
+	//fill rotY
+	rotY(0, 0) = cos(theta_y);
+	rotY(0, 1) = 0;
+	rotY(0, 2) = sin(theta_y);
+
+	rotY(1, 0) = 0;
+	rotY(1, 1) = 1;
+	rotY(1, 2) = 0;
+
+	rotY(2, 0) = -sin(theta_y);
+	rotY(2, 1) = 0;
+	rotY(2, 2) = cos(theta_y);
+
+	//fill rotZ
+	rotZ(0, 0) = cos(theta_z);
+	rotZ(0, 1) = -sin(theta_z);
+	rotZ(0, 2) = 0;
+
+	rotZ(1, 0) = sin(theta_z);
+	rotZ(1, 1) = cos(theta_z);
+	rotZ(1, 2) = 0;
+
+	rotZ(2, 0) = 0;
+	rotZ(2, 1) = 0;
+	rotZ(2, 2) = 1;
+
+	matrix<double> temp(3, 3);
+	temp = prod(rotX, rotY);
+	endOrientation = prod(temp, rotZ);
+
+
+	//Keep the current position
+	endPose = currentPose;
+	//put the orientation matrix into the endPose
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			endPose(i, j) = endOrientation(i, j);
+		}
+	}
+
+	endPoseJoints = inverse_kinematics_.computeInverseKinematics(endPose);
+
+	if (endPoseJoints.solutions.size() > 0) {
+		IKResult* result = path_planner_.chooseNearest(currentAngles, path_planner_.checkForValidConfigurations(endPoseJoints));
+		if (result)
+		{
+			return setJoints(result->nearestSolution);
+		}
+	}
+	
+	return false;
+}
+
+
+
+
+
+
+
+/// <summary>
+/// Waits the until robot has finished movement.
+/// </summary>
+/// <remarks>
+/// The robot movement is finished when no commands are left in its queue. Therefore the method waits for an empty queue.
+/// </remarks>
+/// <param name="pollTime">The poll time.</param>
+void UR5::waitUntilFinished(int pollTime){
+	std::string respString;
+	std::string respString_old;
+	int queueLength = INT_MAX;
+	bool finished = false;
+
+	// get queue length until queue is empty
+	while (!finished)
+	{
+		respString = std::string(tcp_client_->command("GetPositionJoints"));
+		if (respString.compare(respString_old) != 0) {
+			respString_old = respString;
+			std::this_thread::sleep_for(std::chrono::milliseconds(pollTime));
+			continue;			
+		}
+		else {
+			finished = true;
+			std::cout << "Finished" << std::endl;
+		}
 	}
 }
 
-matrix<double> UR5::orientateAlongVector(double x, double y, double z){
-	/*double theta_x, theta_y, theta_z;
-
-	boost::numeric::ublas::vector<double> vector(3);
-
+bool UR5::checkCommandSuccess(const char* server_answer)
+{	
+	if (boost::starts_with(server_answer, "true"))
+	{
+		return true;
+	}
 	
+	return false;
+}
+
+bool UR5::setSpeed(double speedValue) {
+	char commandString[100];
+	sprintf(commandString, "SetSpeed %lf ", speedValue);
+
+	return checkCommandSuccess(tcp_client_->command(commandString));
+}
+
+bool UR5::enableLinearMovement()
+{
+	return checkCommandSuccess(tcp_client_->command("EnableLin"));
+}
+
+bool UR5::disableLinearMovement() 
+{
+	return checkCommandSuccess(tcp_client_->command("DisableLin"));
+}
+
+
+
+
+
+/*matrix<double> UR5::orientateAlongVector(double x, double y, double z){
+	double theta_x, theta_y, theta_z;
+
+	vector<double> vector(3);
+
+
 	//Einheitsvektoren
-	boost::numeric::ublas::vector<double> e_x(3);
-	boost::numeric::ublas::vector<double> e_y(3);
-	boost::numeric::ublas::vector<double> e_z(3);
+	vector<double> e_x(3);
+	vector<double> e_y(3);
+	vector<double> e_z(3);
 
 	vector.insert_element(0, x);
 	vector.insert_element(1, y);
 	vector.insert_element(2, z);
-	
+
 
 	double yzLength = sqrt(pow(y, 2) + pow(z, 2));
 	double xAngle = 0;
 	if (yzLength != 0) {
-		xAngle = acos(z / yzLength);
+	xAngle = acos(z / yzLength);
 	}
 	if (y < 0) {
-		xAngle -= PI;
+	xAngle -= PI;
 	}
 
 	double yAngle2 = 0;
 	double vecLength = norm_2(vector);
 	if (vecLength != 0) {
-		yAngle2 = acos(yzLength / vecLength);
+	yAngle2 = acos(yzLength / vecLength);
 	}
 	if (x < 0) {
-		yAngle2 -= PI;
+	yAngle2 -= PI;
 	}
-	
-	return rotateEndEffector((2*PI) - xAngle, yAngle2, 0);*/
 
+	return rotateEndEffector((2*PI) - xAngle, yAngle2, 0);
+}*/
 
+matrix<double> UR5::orientateAlongVector(double x, double y, double z){
 	// create z unit vector
 	vector<double> e_z(3);
 	e_z <<= 0, 0, 1;
+
+	/*matrix<double> e_z_pose(identity_matrix<double>(4));
+	e_z_pose(2, 3) = 1;
+	e_z_pose = prod(e_z_pose,robot_to_needle_transformation_);
+	e_z(0) = e_z_pose(0, 3);
+	e_z(1) = e_z_pose(1, 3);
+	e_z(2) = e_z_pose(2, 3);*/
 
 	// create vector containing direction
 	vector<double> direction(3);
@@ -411,20 +516,20 @@ matrix<double> UR5::orientateAlongVector(double x, double y, double z){
 	return rotation;
 }
 
-boost::numeric::ublas::vector<double> UR5::convertCamToRobPose(boost::numeric::ublas::vector<double> camPosition)
+vector<double> UR5::convertCamToRobPose(vector<double> camPosition)
 {
 	// create 4x4 matrix with given cam position and dummy rotation matrix
 	boost::numeric::ublas::identity_matrix<double> eye(4);
-	boost::numeric::ublas::matrix<double> camPose(eye);
+	matrix<double> camPose(eye);
 	camPose(0, 3) = camPosition(0);
 	camPose(1, 3) = camPosition(1);
 	camPose(2, 3) = camPosition(2);
 
 	// transform matrix
-	boost::numeric::ublas::matrix<double> camPose_rob = convertCamToRobPose(camPose, true);
+	matrix<double> camPose_rob = convertCamToRobPose(camPose, true);
 
 	// reduce result to translation vector
-	boost::numeric::ublas::vector<double> camPosition_rob(3);
+	vector<double> camPosition_rob(3);
 	camPosition_rob(0) = camPose_rob(0, 3);
 	camPosition_rob(1) = camPose_rob(1, 3);
 	camPosition_rob(2) = camPose_rob(2, 3);
@@ -432,17 +537,24 @@ boost::numeric::ublas::vector<double> UR5::convertCamToRobPose(boost::numeric::u
 	return camPosition_rob;
 }
 
-boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose)
+matrix<double> UR5::convertNeedleToRobPose(matrix<double> needlePose)
+{
+	matrix<double> needle2rob(4,4);
+	InvertMatrix(getRobotToNeedleTransformation(), needle2rob);
+	return prod(needlePose,needle2rob);
+}
+
+matrix<double> UR5::convertCamToRobPose(matrix<double> camPose)
 {
 	return convertCamToRobPose(camPose, true);
 }
 
-boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::ublas::matrix<double> camPose, bool use_orthogonalization)
+matrix<double> UR5::convertCamToRobPose(matrix<double> camPose, bool use_orthogonalization)
 {	
 	if (use_orthogonalization)
 	{
 		// orthonormalize pose	
-		boost::numeric::ublas::matrix<double> transformationMatrix(4, 4);
+		matrix<double> transformationMatrix(4, 4);
 
 		alglib::real_1d_array w;
 		alglib::real_2d_array u;
@@ -451,7 +563,7 @@ boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::u
 		alglib::real_2d_array a;
 		a.setlength(3, 3);
 
-		boost::numeric::ublas::matrix<double> pose = prod(robot_to_cam_transformation_, camPose);
+		matrix<double> pose = prod(robot_to_cam_transformation_, camPose);
 
 		for (int i = 0; i < 3; i++)
 		{
@@ -469,8 +581,8 @@ boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::u
 		int vtCols = vt.cols();
 		int vtRows = vt.rows();
 
-		boost::numeric::ublas::matrix<double> uBoost(uCols, uRows);
-		boost::numeric::ublas::matrix<double> vtBoost(vtCols, vtRows);
+		matrix<double> uBoost(uCols, uRows);
+		matrix<double> vtBoost(vtCols, vtRows);
 
 		for (int i = 0; i < u.cols(); i++)
 		{
@@ -488,7 +600,7 @@ boost::numeric::ublas::matrix<double> UR5::convertCamToRobPose(boost::numeric::u
 			}
 		}
 
-		boost::numeric::ublas::matrix<double> rot = prod(uBoost, vtBoost);
+		matrix<double> rot = prod(uBoost, vtBoost);
 
 		transformationMatrix <<= rot(0, 0), rot(0, 1), rot(0, 2), pose(0, 3),
 			rot(1, 0), rot(1, 1), rot(1, 2), pose(1, 3),
@@ -511,13 +623,9 @@ matrix<double> UR5::orientateAlongVector(vector<double> vec){
 	return orientateAlongVector(vec[0], vec[1], vec[2]);
 }
 
-matrix<double> UR5::moveAlongVector(vector<double> vec){
-	return moveAlongVector(vec[0], vec[1], vec[2]);
-}
 
-void UR5::moveToPosition(vector<double> vec){
-	moveToPosition(vec[0], vec[1], vec[2]);
-}
+
+
 
 void UR5::doNeedlePlacement(vector<double> target, vector<double> window, matrix<double> needleTip) {
 	IKResult result, oldResult;
@@ -610,98 +718,111 @@ vector<double> UR5::convertPixelToProbe(int x, int y) {
 	return result;
 }
 
+matrix<double> UR5::getEndEffectorPose()
+{
+	JointAngles jointAngles = getJoints("rad");
+	DirectKinematics directKinematics;
+	return directKinematics.computeDirectKinematics(jointAngles);
+}
+
+matrix<double> UR5::getNeedlePose()
+{
+	JointAngles jointAngles = getJoints("rad");
+	DirectKinematics directKinematics;
+	return prod(getEndEffectorPose(), robot_to_needle_transformation_);
+}
+
+
+
 /// <summary>
 /// Places the needle.
 /// </summary>
 /// <param name="target">The target.</param>
 /// <param name="window_center">The window_center.</param>
 /// <param name="log_movement">Movement is logged to CSV files after being complete dif set to <c>true</c> [log_movement].</param>
-void UR5::needlePlacement(vector<double> target, vector<double> window_center, bool log_movement)
+bool UR5::needlePlacement(vector<double> target, vector<double> window_center, bool log_movement)
 {
 	/* TODO:
 		- Position outside of box has fixed distance from window but should be calculated
-		- Does moveAlongVector move on straight line? It does not look like a straight line in simulator.
-		- Needle needs to be taken into account
 	*/
 	
 	CSVParser csvParser;
+	InverseKinematics inverseKinematics;
+	DirectKinematics directKinematics;
+	bool success = true;
 	
-	// CALCULATE POSITIONS OUTSIDE OF BOX 
-	// calculate vector from middle to tumor point
-	vector<double> window_to_target = target - window_center;
+	// CALCULATION OF POSITIONS PRIOR TO MOVEMENT	
+		vector<double> window_to_target = target - window_center; // vector from middle to tumor point
 
-	// calculate position outside of box
-	vector<double> outside_point = window_center - 0.3*(window_to_target / norm_2(window_to_target));
-	std::cout << "outside_point: " << outside_point << std::endl;
+		double step_size = 0.005; // stepsize in m
+		double min_distance = 0.05; // minimum distance from window to needle for outside position
+		double max_distance = 0.5; // distance does not need to be further than this 
 
-	// calcuate position outside of box with z offset
-	vector<double> outside_point_z_offset(outside_point);
-	outside_point_z_offset(2) += 0.3;
-	std::cout << "outside_point_z_offset: " << outside_point << std::endl;
+		vector<double> direction = (-window_to_target) / norm_2(window_to_target);	// normed vector from window center pointing away from target
+		matrix<double> rot = orientateAlongVector(window_to_target); // desired needle rotation for outside pose
+
+		matrix<double> outside_pose; // holds the final pose after calculation
+		IKResult* result;
+		double distance = min_distance;
+		do
+		{			
+			// calculate pose with increased distance from window center
+			vector<double> position = window_center + direction*distance;
+
+			// convert to robot coordinates
+			matrix<double> pose_rob = convertNeedleToRobPose(MathTools::composeMatrix(rot, position));
+
+			// check whether pose is reachable or not
+			IKResult ikResult = inverseKinematics.computeInverseKinematics(pose_rob);
+			if (ikResult.solutions.size() > 0) {
+				result = path_planner_.chooseNearest(getJoints("rad"), path_planner_.checkForValidConfigurations(ikResult));
+				if (result)
+				{
+					// set new pose
+					outside_pose = directKinematics.computeDirectKinematics(result->nearestSolution);
+				}
+			}
+
+			// increase distance for next iteration
+			distance += step_size;
+		} while (result && (distance <= max_distance)); // break on first illegal pose or maximum distance
 
 
-	// MOVE TO POINTS OUTSIDE OF BOX
-	// move to outside point with z offset
-	matrix<double> outside_z_offset_matrix = moveAndWait(&UR5::moveToPosition, outside_point_z_offset);
-	std::cout << "outside_z_offset_matrix: " << outside_z_offset_matrix << std::endl;
-	if (log_movement)
-	{
-		csvParser.writeHTM(outside_z_offset_matrix, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_outside_z_offset_matrix.csv");
-	}
+		// check for existence of position
+		if (outside_pose.size1() == 0)
+		{
+			std::cout << "No appropiate position outside of box found" << std::endl;
+			return false;
+		}
+			
 
-	// move to outside point
-	matrix<double> outside_matrix = moveAndWait(&UR5::moveToPosition, outside_point);
-	std::cout << "outside_matrix: " << outside_matrix << std::endl;
-	if (log_movement)
-	{
-		csvParser.writeHTM(outside_matrix, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_outside_matrix.csv");
-	}
+	// STEP 1: MOVE TO POSE OUTSIDE OF BOX
+		success = moveAndWait(&UR5::moveToPose, outside_pose, outside_pose);
+		if (!success)
+		{
+			return false;
+		}
+		if (log_movement)
+		{
+			csvParser.writeHTM(outside_pose, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_outside_matrix.csv");
+		}
 
 
-	// ORIENTATE ROBOT THE RIGHT DIRECTION
-	// align with right direction
-	vector<double> dirVector = window_to_target;
-	std::cout << "dirVector: " << dirVector << std::endl;
-	matrix<double> rotation = orientateAlongVector(dirVector(0), dirVector(1), dirVector(2));
-	vector<double> translation = MathTools::getTranslation(outside_matrix);
-	matrix<double> outside_matrix_right_orientation = MathTools::composeMatrix(rotation, translation);
-	std::cout << "outside_matrix_right_orientation prior to movement: " << outside_matrix_right_orientation << std::endl;
+	// STEP 2: MOVE INTO TUMOR ON STRAIGHT LINE
+		matrix<double> finalMatrix(4, 4);
 
-	outside_matrix_right_orientation = moveAndWait(&UR5::moveToPose, outside_matrix_right_orientation);
-	std::cout << "outside_matrix_right_orientation after movement: " << outside_matrix_right_orientation << std::endl;
-	if (log_movement)
-	{
-		csvParser.writeHTM(outside_matrix_right_orientation, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_outside_right_orientation_matrix.csv");
-	}
+		// actual movement
+		success = moveAndWait(&UR5::moveLinear, convertNeedleToRobPose(MathTools::composeMatrix(MathTools::getRotation(getNeedlePose()), target)), finalMatrix);
+		if (!success)
+		{
+			return false;
+		}
+		if (log_movement) 
+		{ 
+			csvParser.writeHTM(finalMatrix, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_final_matrix.csv"); 
+		}
 
-	// MOVE INTO TUMOR ON STRAIGHT LINE
-	vector<double> vec = target - translation;
-	moveAlongVector(vec);
-	waitUntilFinished(500);
-	JointAngles jointAngles = getJoints("rad");
-	DirectKinematics directKinematics;
-	matrix<double> finalMatrix = directKinematics.computeDirectKinematics(jointAngles);
-	std::cout << "outsideRightOrientationMatrix: " << finalMatrix << std::endl;
-	if (log_movement)
-	{
-		csvParser.writeHTM(finalMatrix, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_final_matrix.csv");
-	}
+	return true;
 }
 
-matrix<double> UR5::moveAndWait(void(UR5::* moveFunction)(vector<double>), vector<double> vec)
-{
-	(this->*moveFunction)(vec);
-	waitUntilFinished(500);
-	JointAngles jointAngles = getJoints("rad");
-	DirectKinematics directKinematics;
-	return directKinematics.computeDirectKinematics(jointAngles);
-}
 
-matrix<double> UR5::moveAndWait(void(UR5::* moveFunction)(matrix<double>), matrix<double> mat)
-{
-	(this->*moveFunction)(mat);
-	waitUntilFinished(500);
-	JointAngles jointAngles = getJoints("rad");
-	DirectKinematics directKinematics;
-	return directKinematics.computeDirectKinematics(jointAngles);
-}

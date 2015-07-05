@@ -1,6 +1,7 @@
 #pragma once
 
 #include "MathTools.hpp"
+#define PI boost::math::constants::pi<double>()
 
 matrix<double> MathTools::composeMatrix(matrix<double> rotation, vector<double> translation)
 {
