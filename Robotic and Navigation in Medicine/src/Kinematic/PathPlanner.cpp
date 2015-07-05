@@ -40,12 +40,16 @@ IKResult PathPlanner::checkForValidConfigurations(IKResult configs){
 	matrix<double> jointPosition(4, 4);
 	int value = 0;
 
+	double maxWrist1Angle = 0 * PI / 180;
+	double minWrist1Angle = -180 * PI / 180;
+
 	double maxWrist2Angle = 90 * (PI / 180);
 	double minWrist2Angle = -maxWrist2Angle;
 
 	for (int i = 0; i < configs.solutions.size(); i++) {
 		value = 0;
-		if (-180 <= configs.solutions[i].getWrist1Angle() && configs.solutions[i].getWrist1Angle() <= 0 /*&& minWrist2Angle <= configs.solutions[i].getWrist2Angle() && configs.solutions[i].getWrist2Angle() <= maxWrist2Angle*/){
+		if (minWrist1Angle <= configs.solutions[i].getWrist1Angle() && configs.solutions[i].getWrist1Angle() <= maxWrist1Angle /*&& minWrist2Angle <= configs.solutions[i].getWrist2Angle() && configs.solutions[i].getWrist2Angle() <= maxWrist2Angle*/){
+		{
 			for (int j = 0; j < 6; j++) {
 				jointPosition = direct_kinematics_.getPositionOfJoint(j, configs.solutions[i]);
 				//If the z coordinate of the joint is above the table
