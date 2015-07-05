@@ -8,10 +8,41 @@
     load('Calibration/Data/handEyeData.mat');
     rob2needle = csvread('Input/rob2needle.csv');
     %windowPoints = csvread('Input/windowPoints.csv');
-    windowPoints = csvread('Input/Copy_of_windowPoints.csv'); 
+    windowPoints = csvread('Input/windowPoints_backup.csv'); 
     
     % create figure;
     simFig = figure(1);
+    hold on;
+    grid on;
+    hold off;
+    
+            
+    xStart = [0.8 0 0.1];
+    yStart = [0 0.8 0.1]
+    diff = (yStart-xStart);
+    
+%     figure(simFig);
+%     hold on;
+%     plot3([xStart(1) yStart(1)], [xStart(2) yStart(2)], [xStart(3) yStart(3)], 'k-');
+%     hold off;
+%     
+
+%%% Create new coordinates
+%     windowPointTranslations_rob(1,:) = xStart+diff*0.3;
+%     windowPointTranslations_rob(2,:) = xStart+diff*0.7;
+%     windowPointTranslations_rob(3,:) = windowPointTranslations_rob(2,:) + [0 0 0.1];
+%     windowPointTranslations_rob(4,:) = windowPointTranslations_rob(1,:) + [0 0 0.1];
+%     
+%     windowPointsHTM_cam = zeros(4,4,size(windowPointTranslations_rob,1));
+%     windowPoints= zeros(size(windowPointTranslations_rob,1), 3);
+%     for i = 1:size(windowPoints,1);
+%         windowPointsHTM_cam(:,:,i) = [eye(3) windowPointTranslations_rob(i,:)'; 0 0 0 1];
+%         windowPointsHTM_cam(:,:,i) = inv(Y)*windowPointsHTM_cam(:,:,i);
+%         windowPointsHTM_cam(:,:,i) = orth(windowPointsHTM_cam(:,:,i));
+%         windowPoints(i,:) = windowPointsHTM_cam(1:3,4,i);
+%     end
+    
+    
     
 %% Create tumor
     
@@ -33,17 +64,12 @@
         windowPointTranslations_rob(i,:) = windowPointsHTM_rob(1:3,4,i);
     end
     
-%     windowPointTranslations_rob(1,:) = [0.3 0.3 0.1];
-%     windowPointTranslations_rob(3,:) = [0.4 0.4 0.2];
-%     windowPointTranslations_rob(2,:) = [0.3 0.4 0.1];
-%     windowPointTranslations_rob(4,:) = [0.4 0.3 0.2];
-    
     % Calculate middle of window in rob world
     windowMiddle_rob = mean(windowPointTranslations_rob);
     
     % add window to plot
     figure(simFig);
-    hold on;
+    hold on;    
     plot3(windowPointTranslations_rob(:,1), windowPointTranslations_rob(:,2), windowPointTranslations_rob(:,3), 'ro');
     plot3(windowMiddle_rob(1), windowMiddle_rob(2), windowMiddle_rob(3), 'rx', 'MarkerSize', 25);
     fill3(windowPointTranslations_rob(:,1), windowPointTranslations_rob(:,2), windowPointTranslations_rob(:,3), 'r');
