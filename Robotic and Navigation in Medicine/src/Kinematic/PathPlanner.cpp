@@ -45,8 +45,6 @@ IKResult PathPlanner::checkForValidConfigurations(IKResult configs){
 
 	for (int i = 0; i < configs.solutions.size(); i++) {
 		value = 0;
-		std::cout << configs.solutions[i].getWrist1Angle() << std::endl;
-
 		if (-180 <= configs.solutions[i].getWrist1Angle() && configs.solutions[i].getWrist1Angle() <= 0 /*&& minWrist2Angle <= configs.solutions[i].getWrist2Angle() && configs.solutions[i].getWrist2Angle() <= maxWrist2Angle*/){
 			for (int j = 0; j < 6; j++) {
 				jointPosition = direct_kinematics_.getPositionOfJoint(j, configs.solutions[i]);
