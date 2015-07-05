@@ -52,22 +52,26 @@ public:
 	bool moveToPose(double x, double y, double z, double theta_x, double theta_y, double theta_z);
 	bool moveToPose(matrix<double> endPose);
 	bool moveLinear(matrix<double> pose);
+	bool moveLinear(JointAngles angles);
 	bool moveAlongVector(vector<double> vec);
 	bool moveAlongVector(double x, double y, double z);
 	bool moveToHomePosition();
 	bool UR5::moveAndWait(bool(UR5::* moveFunction)(vector<double>), vector<double> vec, matrix<double> &outMatrix);
 	bool UR5::moveAndWait(bool(UR5::* moveFunction)(matrix<double>), matrix<double> mat, matrix<double> &outMatrix);
+	bool UR5::moveAndWait(bool(UR5::* moveFunction)(JointAngles), JointAngles jointAngles, matrix<double> &outMatrix);
+
 
 	//Keep the position and rotate the effector by the given angles
 	bool rotateEndEffector(double theta_x, double theta_y, double theta_z);
 	matrix<double> orientateAlongVector(double x, double y, double z);
 	matrix<double> orientateAlongVector(vector<double> vec);
+	bool interpolateLine(JointAngles startAngles, vector<double> endPosition, double max_change_in_rotation, double step_size, std::vector<JointAngles> &lineJointAngles);
 
 
 
 
 	void doNeedlePlacement(vector<double> target, vector<double> window, matrix<double> needleTip);
-	bool needlePlacement(vector<double> target, vector<double> window_center, bool log_movement);
+	bool needlePlacement(vector<double> target, vector<double> window_center, bool log_movement, bool move_interpolated);
 
 	
 	void waitUntilFinished(int pollTime);

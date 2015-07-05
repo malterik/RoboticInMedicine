@@ -71,7 +71,9 @@ int main(int argc, char* argv[])
 	std::cout << "window_middle_rob: " << window_middle_rob << std::endl;
 
 	// NEEDLE PLACEMENT
-	robot.needlePlacement(tumor_position_rob, window_middle_rob, true);
+	bool log_movement = true;
+	bool move_interpolated = true;
+	robot.needlePlacement(tumor_position_rob, window_middle_rob, log_movement, move_interpolated);
 
 	system("Pause");
 	return 0;

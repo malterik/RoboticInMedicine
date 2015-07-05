@@ -273,6 +273,19 @@ bool UR5::moveLinear(matrix<double> pose)
 	return false;
 }
 
+bool UR5::moveLinear(JointAngles angles)
+{
+	char commandString[100];
+	sprintf(commandString, "MoveLINJoints %f %f %f %f %f %f ", angles[0] * (180 / PI), angles[1] * (180 / PI), angles[2] * (180 / PI), angles[3] * (180 / PI), angles[4] * (180 / PI), angles[5] * (180 / PI));
+	std::cout << commandString << std::endl;
+
+	enableLinearMovement();
+	bool success = checkCommandSuccess(tcp_client_->command(commandString));
+	disableLinearMovement();
+
+	return success;
+}
+
 bool UR5::moveToHomePosition(){
 	JointAngles homePos;
 
@@ -302,6 +315,20 @@ bool UR5::moveAndWait(bool(UR5::* moveFunction)(matrix<double>), matrix<double> 
 		DirectKinematics directKinematics;
 		outMatrix = directKinematics.computeDirectKinematics(jointAngles);
 		std::cout << outMatrix << std::endl;
+		return true;
+	}
+
+	return false;
+}
+
+bool UR5::moveAndWait(bool(UR5::* moveFunction)(JointAngles), JointAngles jointAngles, matrix<double> &outMatrix)
+{
+	if ((this->*moveFunction)(jointAngles))
+	{
+		waitUntilFinished(5);
+		JointAngles jointAngles = getJoints("rad");
+		DirectKinematics directKinematics;
+		outMatrix = directKinematics.computeDirectKinematics(jointAngles);
 		return true;
 	}
 
@@ -386,7 +413,60 @@ bool UR5::rotateEndEffector(double theta_x, double theta_y, double theta_z) {
 	return false;
 }
 
+bool UR5::interpolateLine(JointAngles startAngles, vector<double> endPosition, double max_change_in_rotation, double step_size, std::vector<JointAngles> &lineJointAngles)
+{
+	InverseKinematics inverseKinematics;
+	DirectKinematics directKinematics;
+	bool success = true;
 
+	matrix<double> rob_pose = directKinematics.computeDirectKinematics(startAngles);
+	matrix<double> needle_pose = prod(rob_pose, robot_to_needle_transformation_);
+
+	matrix<double> endeEffectorRotation = MathTools::getRotation(rob_pose);
+	vector<double> endeEffectorTranslation = MathTools::getTranslation(rob_pose);
+	matrix<double> needleRotation = MathTools::getRotation(needle_pose);
+	vector<double> direction = endPosition - MathTools::getTranslation(needle_pose);
+	vector<double> direction_normed = direction / norm_2(direction);
+
+	// adjust step_size to end exactly in target
+	int steps = (int)(ceil(norm_2(direction) / step_size));
+	step_size = norm_2(direction) / ((double)steps);
+
+	lineJointAngles = std::vector<JointAngles>();
+	JointAngles lastAngles = startAngles;
+
+	for (int i = 1; i < (steps + 1); i++)
+	{
+		vector<double> position_rob = endeEffectorTranslation + direction_normed*i*step_size;
+		matrix<double> pose_rob = MathTools::composeMatrix(endeEffectorRotation, position_rob);
+
+		IKResult ikResult = inverseKinematics.computeInverseKinematics(pose_rob);
+
+		if (ikResult.solutions.size() > 0) {
+			IKResult* result = path_planner_.chooseNearest(lastAngles, path_planner_.checkForValidConfigurations(ikResult));
+			if (result)
+			{
+				JointAngles jA = result->nearestSolution;
+
+				double angleChange = MathTools::getChangeInRotation(jA, lastAngles);
+				if (angleChange > max_change_in_rotation)
+				{
+					// max angle constraint violated
+					return false;
+				}
+
+				lineJointAngles.push_back(jA);
+				lastAngles = jA;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+
+	return true;
+}
 
 
 
@@ -734,71 +814,65 @@ matrix<double> UR5::getNeedlePose()
 
 
 
+
 /// <summary>
 /// Places the needle.
 /// </summary>
 /// <param name="target">The target.</param>
 /// <param name="window_center">The window_center.</param>
 /// <param name="log_movement">Movement is logged to CSV files after being complete dif set to <c>true</c> [log_movement].</param>
-bool UR5::needlePlacement(vector<double> target, vector<double> window_center, bool log_movement)
+bool UR5::needlePlacement(vector<double> target, vector<double> window_center, bool log_movement, bool move_interpolated)
 {
-	/* TODO:
-		- Position outside of box has fixed distance from window but should be calculated
-	*/
-	
 	CSVParser csvParser;
 	InverseKinematics inverseKinematics;
 	DirectKinematics directKinematics;
 	bool success = true;
 	
-	// CALCULATION OF POSITIONS PRIOR TO MOVEMENT	
-		vector<double> window_to_target = target - window_center; // vector from middle to tumor point
+	// PLANNING
+	double distance = 0.05; // minimum distance from window to needle for outside position
+	double max_change_in_rotation = 20 * (PI / 180); // maximum sum of joint angles between two poses for line interpolation
+	double step_size = 0.005; // stepsize in m for line interpolation
+	vector<double> window_to_target = target - window_center; // vector from middle to tumor point
 
-		double step_size = 0.005; // stepsize in m
-		double min_distance = 0.05; // minimum distance from window to needle for outside position
-		double max_distance = 0.1; // distance does not need to be further than this 
+	vector<double> direction = (-window_to_target) / norm_2(window_to_target);	// normed vector from window center pointing away from target
+	matrix<double> rot = orientateAlongVector(window_to_target); // desired needle rotation for outside pose
+	matrix<double> outside_pose; // holds the final pose after calculation
 
-		vector<double> direction = (-window_to_target) / norm_2(window_to_target);	// normed vector from window center pointing away from target
-		matrix<double> rot = orientateAlongVector(window_to_target); // desired needle rotation for outside pose
+	// calculate pose with increased distance from window center
+	vector<double> position = window_center + direction*distance;
 
-		matrix<double> outside_pose; // holds the final pose after calculation
-		IKResult* result;
-		double distance = min_distance;
-		do
-		{			
-			// calculate pose with increased distance from window center
-			vector<double> position = window_center + direction*distance;
+	// convert to robot coordinates
+	matrix<double> pose_rob = convertNeedleToRobPose(MathTools::composeMatrix(rot, position));
 
-			// convert to robot coordinates
-			matrix<double> pose_rob = convertNeedleToRobPose(MathTools::composeMatrix(rot, position));
+	// comput inverse kinematics
+	IKResult ikResult = inverseKinematics.computeInverseKinematics(pose_rob);
 
-			// check whether pose is reachable or not
-			IKResult ikResult = inverseKinematics.computeInverseKinematics(pose_rob);
-			if (ikResult.solutions.size() > 0) {
-				result = path_planner_.chooseNearest(getJoints("rad"), path_planner_.checkForValidConfigurations(ikResult));
-				if (result)
-				{
-					// set new pose
-					outside_pose = directKinematics.computeDirectKinematics(result->nearestSolution);
-				}
-			}
+	// find joint angles that allow linear movement
+	std::vector<JointAngles> lineJointAngles;
+	bool pathFound = false;
+	for (int i = 0; ikResult.solutions.size(); i++)
+	{
+		// check whether linear movement is possible or not
+		pathFound = interpolateLine(ikResult.solutions[i], target, max_change_in_rotation, step_size, lineJointAngles);
 
-			// increase distance for next iteration
-			distance += step_size;
-		} while (result && (distance <= max_distance)); // break on first illegal pose or maximum distance
-
-
-		// check for existence of position
-		if (outside_pose.size1() == 0)
+		if (pathFound)
 		{
-			std::cout << "No appropiate position outside of box found" << std::endl;
-			return false;
+			// take first solution
+			pathFound = true;
+			break;
 		}
-			
+	}
+
+	if (!pathFound)
+	{
+		std::cout << "Target cannot be reached with linear movement" << std::endl;
+		return false;
+	}
 
 	// STEP 1: MOVE TO POSE OUTSIDE OF BOX
-		std::cout << "outside_pose_pre: " << outside_pose << std::endl;
-		success = moveAndWait(&UR5::moveToPose, outside_pose, outside_pose);
+		std::cout << "outside_pose_pre: " << pose_rob << std::endl;
+		//success = moveAndWait(&UR5::moveToPose, outside_pose, outside_pose);
+		success = moveAndWait(&UR5::setJoints, lineJointAngles[0], outside_pose);
 		if (!success)
 		{
 			return false;
@@ -810,23 +884,37 @@ bool UR5::needlePlacement(vector<double> target, vector<double> window_center, b
 		std::cout << "outside_pose: " << outside_pose << std::endl;
 
 	// STEP 2: MOVE INTO TUMOR ON STRAIGHT LINE
-		matrix<double> finalMatrix(4, 4);
+		matrix<double> final_pose;
 
-		// actual movement
-		matrix<double> finalPosePre = convertNeedleToRobPose(MathTools::composeMatrix(MathTools::getRotation(getNeedlePose()), target));
-		std::cout << "finalPosePre: " << finalPosePre << std::endl;
-		if (log_movement)
+		if (move_interpolated)
 		{
-			csvParser.writeHTM(finalPosePre, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_final_matrix_pre.csv");
+			// move on interpolated line
+			for (int i = 0; i < lineJointAngles.size(); i++)
+			{
+				success = moveAndWait(&UR5::setJoints, lineJointAngles[i], final_pose);
+				if (!success)
+				{
+					return false;
+				}
+				if (log_movement)
+				{
+					csvParser.writeHTM(final_pose, std::string(SIMULATION_OUTPUT_FOLDER) + std::string("sim_final_matrix") + std::to_string(i) + std::string(".csv"));
+				}
+			}
 		}
-		success = moveAndWait(&UR5::moveLinear, finalPosePre, finalMatrix);
-		if (!success)
+		else
 		{
-			return false;
-		}
-		if (log_movement) 
-		{ 
-			csvParser.writeHTM(finalMatrix, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_final_matrix.csv"); 
+			// use linear movement function provided by robot
+			final_pose = convertNeedleToRobPose(MathTools::composeMatrix(MathTools::getRotation(getNeedlePose()), target));
+			success = moveAndWait(&UR5::moveLinear, final_pose, final_pose);
+			if (!success)
+			{
+				return false;
+			}
+			if (log_movement)
+			{
+				csvParser.writeHTM(final_pose, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_final_matrix0.csv");
+			}
 		}
 
 	return true;

@@ -48,7 +48,7 @@ IKResult PathPlanner::checkForValidConfigurations(IKResult configs){
 
 	for (int i = 0; i < configs.solutions.size(); i++) {
 		value = 0;
-		if (minWrist1Angle <= configs.solutions[i].getWrist1Angle() && configs.solutions[i].getWrist1Angle() <= maxWrist1Angle /*&& minWrist2Angle <= configs.solutions[i].getWrist2Angle() && configs.solutions[i].getWrist2Angle() <= maxWrist2Angle*/){
+		if (minWrist1Angle <= configs.solutions[i].getWrist1Angle() && configs.solutions[i].getWrist1Angle() <= maxWrist1Angle /*&& minWrist2Angle <= configs.solutions[i].getWrist2Angle() && configs.solutions[i].getWrist2Angle() <= maxWrist2Angle*/)
 		{
 			for (int j = 0; j < 6; j++) {
 				jointPosition = direct_kinematics_.getPositionOfJoint(j, configs.solutions[i]);
