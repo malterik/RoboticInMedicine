@@ -29,23 +29,30 @@ int main(int argc, char* argv[])
 	CSVParser csvParser;
 	boost::numeric::ublas::matrix<double> robot_to_cam_transformation = csvParser.readHTM(std::string(INPUT_FOLDER) + "rob2cam.csv");
 	boost::numeric::ublas::matrix<double> robot_to_needle_transformation = csvParser.readHTM(std::string(INPUT_FOLDER) + "rob2needle.csv");
-	boost::numeric::ublas::matrix<double> marker_position = csvParser.readHTM(std::string(INPUT_FOLDER) + "camHTM.csv");
+	//boost::numeric::ublas::matrix<double> marker_position = csvParser.readHTM(std::string(INPUT_FOLDER) + "camHTM.csv");
 	boost::numeric::ublas::matrix<double> pixel_to_probe = csvParser.readHTM(std::string(INPUT_FOLDER) + "ImageToProbe.csv");
-	boost::numeric::ublas::matrix<double> probe_pose = csvParser.readHTM(std::string(INPUT_FOLDER) + "fileoutpos.txt");
+	boost::numeric::ublas::matrix<double> probe_pose = csvParser.readHTM(std::string(INPUT_FOLDER) + "probe.csv");
 	boost::numeric::ublas::vector<double> tumor_position = csvParser.readVector3D(std::string(INPUT_FOLDER) + "tumorCenter.csv");
 	std::vector<boost::numeric::ublas::vector<double>> window_points = csvParser.readWindow(std::string(INPUT_FOLDER) + "windowPoints.csv");
 	
 	// INITIALIZE ROBOT
 	UR5 robot;
-	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
-	robot.setSpeed(50);
+	robot.connectToRobot(ROBOT_IP_LABOR, ROBOT_PORT);
+	robot.setSpeed(3);
 	robot.disableLinearMovement();
 	robot.setRobotToCamTransformation(robot_to_cam_transformation);
 	robot.setRobotToNeedleTransformation(robot_to_needle_transformation);
+	std::cout << "Pixel to Probe 1: " << pixel_to_probe << std::endl << std::endl;
+	std::cout << "Probe 1: " << probe_pose << std::endl << std::endl;
 	robot.setPixelToProbeTransformation(pixel_to_probe);
+
+	vector<double> usPose = robot.convertCamToRobPose(prod(probe_pose,robot.convertPixelToProbe(278, 50)));
+	std::cout << "usPose: " << usPose << std::endl;
+	std::cout << "usPose CameraCoord: " << prod(probe_pose, robot.convertPixelToProbe(278, 50)) << std::endl;
+	//std::cout << "usPose USCoord: " << robot.convertPixelToProbe(412, 62) << std::endl;
 	//robot.moveToHomePosition();
 	//robot.waitUntilFinished(500);
-
+	
 	// PREPARE DATA FOR NEEDLE PLACEMENT (i.e calculate target and window center in robot coordinates)
 	// transform tumor coordinates from camera to robot world
 	boost::numeric::ublas::vector<double> tumor_position_rob = robot.convertCamToRobPose(tumor_position);
@@ -72,7 +79,7 @@ int main(int argc, char* argv[])
 
 	// NEEDLE PLACEMENT
 	bool log_movement = true;
-	bool move_interpolated = true;
+	bool move_interpolated = false;
 	//robot.needlePlacement(tumor_position_rob, window_middle_rob, log_movement, move_interpolated);
 	robot.needlePlacementTwo(tumor_position_rob, window_points_rob, window_middle_rob, log_movement, move_interpolated);
 

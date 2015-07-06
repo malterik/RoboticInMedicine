@@ -68,7 +68,7 @@ surf(rmsDistFromMean(4)*x+meanPointsPhantom(1,4),rmsDistFromMean(4)*y+meanPoints
 %% Segmenting Ultrasound images
 
 % read probe poses
-probePoses = importProbePoses('data\ultrasoundImagesAndPoses\fileout_pos.txt');
+probePoses = importProbePoses('data\ultrasoundImagesAndPoses\fileoutpos.txt');
 
 % take only the measurements with valid pose
 imgMask = (1:20).*(probePoses(:,2)' == 1);
@@ -82,7 +82,7 @@ numImages = size(probePoses,1);
 imgMask = imgMask-1;
 
 % segement the points of the z-wire
-[cc1, cc2, cc3, xmmPerPx, ymmPerPx, allImages, invalid] = segmentZPhantomPointsInUSImages('data\ultrasoundImagesAndPoses\fileout_pos.txt_', numImages,imgMask);
+[cc1, cc2, cc3, xmmPerPx, ymmPerPx, allImages, invalid] = segmentZPhantomPointsInUSImages('data\ultrasoundImagesAndPoses\fileoutpos.txt_', numImages,imgMask);
 
 % remove images with invalid segmentation result
 imgMask(invalid) = [];

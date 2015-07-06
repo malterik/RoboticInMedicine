@@ -788,8 +788,8 @@ vector<double> UR5::convertPixelToProbe(int x, int y) {
 	vector<double> result(4);
 	vector<double> pos(4);
 
-	pos(0) = x*0.0819;
-	pos(1) = y*0.0833;
+	pos(0) = x*0.0000819;
+	pos(1) = y*0.0000833;
 	pos(2) = 0;
 	pos(3) = 1;
 
@@ -832,6 +832,7 @@ bool UR5::needlePlacementTwo(vector<double> target, std::vector<vector<double>> 
 	double step_size = 0.005; // stepsize in m for line interpolation
 
 	std::vector<vector<double>> window_points;
+	window_points.push_back(window_center);
 	window_points.push_back((window_center + window[0]) / 2);
 	window_points.push_back((window_center + window[1]) / 2);
 	window_points.push_back((window_center + window[2]) / 2);
@@ -840,7 +841,7 @@ bool UR5::needlePlacementTwo(vector<double> target, std::vector<vector<double>> 
 	window_points.push_back((window_points[1] + window_points[2]) / 2);
 	window_points.push_back((window_points[2] + window_points[3]) / 2);
 	window_points.push_back((window_points[3] + window_points[1]) / 2);
-	window_points.push_back(window_center);
+	
 
 	matrix<double> pose_rob;
 	std::vector<JointAngles> lineJointAngles;

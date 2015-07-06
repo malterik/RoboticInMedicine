@@ -12,7 +12,7 @@
     camLocator = 'stylusRNM'; % locator name
 
     % Output settings
-    camHTMFile = 'Input\tumorCenter.csv'; % output file for robot joints
+    camHTMFile = 'Input\needleTipLocator2.csv'; % output file for robot joints
 
 %% Initialization
     % Connect to CamBarServer, if necessary
@@ -30,11 +30,8 @@
     [camHTM, timestamp, isVisible, message] = getLocatorTransformMatrix(camSocket, camInStream, camOutStream, camLocator);
     camHTM(1:3,4)=camHTM(1:3,4)/1000;
     disp(camHTM);
+    tumorPos = camHTM(1:3,4);
     
-%     YN = Y*camHTM;
-%     [U,S,V] = svd(YN(1:3,1:3));
-%     [U*V' YN(1:3,4); 0 0 0 1]
-
 %% Save files
-     csvwrite(camHTMFile, camHTM);
-     save('Calibration\Data\endeffector.mat', 'camHTM');
+     csvwrite(camHTMFile, tumorPos);
+     save('Calibration\Data\usTest.mat', 'camHTM');

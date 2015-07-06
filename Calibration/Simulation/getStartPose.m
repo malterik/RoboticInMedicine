@@ -21,8 +21,10 @@
 %% Get joint positions from robot
     startJoints = getJointPositions(robotSocket, robotInStream, robotOutStream );
     disp(startJoints);
-    startPose = directKinematics(startJoints);
+    %startPose = directKinematics(startJoints);
     %startPose = startPose.startPose;
+    startPose = getHTM(robotSocket, robotInStream, robotOutStream );
+    startPose(1:3,4) = startPose(1:3,4)/1000;
     disp(startPose);
 
 %% Save joints to file
