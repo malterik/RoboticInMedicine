@@ -12,13 +12,13 @@ using namespace boost::numeric::ublas;
 
 InverseKinematics::InverseKinematics() {
 
-	SHOULDER =	{{ 1, 1, 1, 1, -1, -1, -1, -1 }};
-	ELBOW =		{{ 1, 1, -1, -1, 1, 1, -1, -1 }};
-	WRIST =		{{ 1, -1, 1, -1, 1, -1, 1, -1 }};
+	//SHOULDER =	{{ 1, 1, 1, 1, -1, -1, -1, -1 }};
+	//ELBOW =		{{ 1, 1, -1, -1, 1, 1, -1, -1 }};
+	//WRIST =		{{ 1, -1, 1, -1, 1, -1, 1, -1 }};
 
-	//SHOULDER =	{{  1,  1, -1, -1 }};
-	//ELBOW =		{{ 1, 1, 1, 1 }};
-	//WRIST =		{{  1, -1,  1, -1 }};
+	SHOULDER =	{{  1,  1, -1, -1 }};
+	ELBOW =		{{ 1, 1, 1, 1 }};
+	WRIST =		{{  1, -1,  1, -1 }};
   }
 
 
@@ -162,15 +162,16 @@ InverseKinematics::InverseKinematics() {
 		  //std::cout << std::endl << std::endl;
 
 		  JointAngles config_i(theta_1[i], theta_2[i], theta_3[i], theta_4[i], theta_5[i], theta_6[i]);
-		  configs.push_back(config_i);
-		  res.solutions = configs;
-		  boost::numeric::ublas::vector<int> temp;
+		  //configs.push_back(config_i);
+		  //res.solutions = configs;
+		  res.solutions.push_back(config_i);
+		  boost::numeric::ublas::vector<int> temp(3);
 		  temp[0] = SHOULDER[i];
 		  temp[1] = ELBOW[i];
 		  temp[2] = WRIST[i];
 		  res.configuration.push_back(temp);
 }
-	
+
 	return res;
   }	
 

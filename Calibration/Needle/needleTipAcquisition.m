@@ -7,15 +7,15 @@
     nMeasurements = 50; % number of measurements
   
     % Network settrings
-    camIP = '127.0.0.1'; % camera ip
+    camIP = '134.28.45.63'; % camera ip
     camPort = 3000; % camera port   
     timeout = 3000; % timeout for tcp reads
     
     % Camera settings
-    camLocator = 'RobAdapter'; % locator name  
+    camLocator = 'NeedleAdapter3'; % locator name  
     
     % Output settings
-    camHTMsFile = 'camNeedleHTMs.mat'; % output file for camera HTMs
+    camHTMsFile = 'needleEndHTMs.mat'; % output file for camera HTMs
 
 %% Initialization
     % Connect to CamBarServer, if necessary
@@ -56,4 +56,5 @@
     end;
 
 %% Save files
-    save(camHTMsFile, 'camNeedleHTMs');
+    needleEndHTMs = camNeedleHTMs(:,:,1:(acquisitionCounter-1));
+    save(camHTMsFile, 'needleEndHTMs');

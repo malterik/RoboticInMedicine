@@ -7,8 +7,12 @@
 #include "JointAngles.h"
 #include "../Robot/DenavitHartenberg.h"
 
-#define NUMBER_OF_SOLUTIONS 8
+#define NUMBER_OF_SOLUTIONS 4
 struct IKResult {
+	IKResult() :
+		nearestConfig(3), solutions(), configuration(),nearestSolution(){};
+	JointAngles nearestSolution;
+	boost::numeric::ublas::vector<double> nearestConfig;
 	std::vector<JointAngles> solutions;
 	std::vector<boost::numeric::ublas::vector<int>> configuration;
 };

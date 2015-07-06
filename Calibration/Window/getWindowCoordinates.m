@@ -7,13 +7,12 @@
     nMeasurements = 50; % number of measurements
   
     % Network settrings
-%     camIP = '134.28.45.63'; % camera ip
-    camIP = '127.0.0.1';
+	camIP = '134.28.45.63'; % camera ip
     camPort = 3000; % camera port   
     timeout = 3000; % timeout for tcp reads
     
     % Camera settings
-    camLocator = 'stylus2'; % locator name  
+    camLocator = 'stylusRNM'; % locator name  
     
     % Output settings
     windowHTMsFile = 'windowHTMs.mat'; 
@@ -60,7 +59,7 @@
 %% extract positions from HTMs
     windowPositions = zeros(acquisitionCounter-1,3); 
     for i = 1:(acquisitionCounter-1);
-        windowPositions(i,:) = windowHTMs(1:3,4,i); 
+        windowPositions(i,:) = windowHTMs(1:3,4,i)/1000; 
     end;
     
     

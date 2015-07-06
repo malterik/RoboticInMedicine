@@ -8,6 +8,9 @@
 #include <vector>
 #include "boost/numeric/ublas/matrix.hpp"
 #include "boost/numeric/ublas/assignment.hpp"
+#include <boost/algorithm/string/join.hpp>
+#include <boost/range/adaptor/transformed.hpp>
+#include <boost/lexical_cast.hpp>
 
 /// <summary>
 /// Initializes a new instance of the <see cref="CalibrationReader"/> class.
@@ -23,6 +26,48 @@ CSVParser::CSVParser()
 /// </summary>
 CSVParser::~CSVParser()
 {
+}
+
+/// <summary>
+/// Imports homogenous transformation matrix from CSV file.
+/// </summary>
+/// <remarks>
+///	The file is expected to have the matrix entries listed in 4 lines with 4 entries. This can be achieved using MATLAB's bulit-in csvwrite command on a 4x4 matrix.
+/// </remarks>
+/// <returns>A homogenous transformation matrix</returns>
+void CSVParser::writeHTM(boost::numeric::ublas::matrix<double> htm, std::string fileName)
+{
+	std::vector<std::vector<double>> data;
+	std::ofstream outfile(fileName);
+
+	for (int i = 0; i < htm.size1(); i++)
+	{
+		/*//boost::numeric::ublas::matrix_row<boost::numeric::ublas::matrix<double>>  row = boost::numeric::ublas::matrix_row<boost::numeric::ublas::matrix<double>>(htm, 1);
+		//boost::numeric::ublas::matrix_row<boost::numeric::ublas::matrix<double>> r(htm, i); #
+			//row(htm, i);
+		
+		boost::numeric::ublas::matrix_row<boost::numeric::ublas::matrix<double>> r(htm, i);
+		std::string joinedString = boost::algorithm::join(r, ',');
+		//std::string joinedString = boost::algorithm::join(boost::numeric::ublas::row(htm,i), ',');*/
+
+		std::vector<double> row;
+		for (int j = 0; j < htm.size2(); j++)
+		{
+			row.push_back(htm(i, j));
+			//row.push_back(boost::lexical_cast<std::string>(htm(i, j)));
+			//row.push_back(htm(i, j).ToString());
+			//double val = htm(1, 2);
+			//val.
+			//row.push_back("balas");
+		}
+		
+		std::string joinedString = boost::algorithm::join(row | boost::adaptors::transformed(static_cast<std::string(*)(double)>(std::to_string)), ",");
+		//std::string joinedString = boost::algorithm::join(row, ",");
+		outfile << joinedString << std::endl;
+	}
+
+	outfile.close();
+	return;
 }
 
 /// <summary>

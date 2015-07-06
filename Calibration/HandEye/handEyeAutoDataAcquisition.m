@@ -9,25 +9,25 @@
     nMeasurements = 50; % number of measurements
   
     % Network settrings
-    robotIP = '192.168.56.101'; % robot ip
+    robotIP = '134.28.45.95'; % robot ip
     robotPort = 5005; % robot port    
-    camIP = '127.0.0.1'; % camera ip
+    camIP = '134.28.45.63'; % camera ip
     camPort = 3000; % camera port   
     timeout = 3000; % timeout for tcp reads
     
     % Camera settings
-    camLocator = 'RobAdapter'; % locator name
+    camLocator = 'NeedleAdapter3'; % locator name
     
     % Robot settings
-    robotSpeed = 100; % speed of robot
+    robotSpeed = 10; % speed of robot
         
     % Input settings
-    defaultJointsFile = 'Data\robStartJoints.mat';
+    defaultJointsFile = 'robStartJoints.mat';
     
     % Output settings
-    robJointsFile = 'Data\robJoints.mat'; % output file for robot joints
-    robHTMsFile = 'Data\robHTMs.mat'; % output file for robot HTMs
-    camHTMsFile = 'Data\camHTMs.mat'; % output file for camera HTMs
+    robJointsFile = 'robJoints.mat'; % output file for robot joints
+    robHTMsFile = 'robHTMs.mat'; % output file for robot HTMs
+    camHTMsFile = 'camHTMs.mat'; % output file for camera HTMs
 
 %% Initialization
     % Connect to CamBarServer, if necessary
@@ -84,18 +84,20 @@
 
         % wait until position is reached
         waitForCompletion(robotSocket, robotInStream, robotOutStream, 'Waiting for robot to reach new calibration pose', 1);
-
+        pause(0.2); % wait for stable position
+        
         % get cam sample
         [T, timestamp, isVisible, message] = getLocatorTransformMatrix(camSocket, camInStream, camOutStream, camLocator);
         
         if (isVisible)
             camHTMs(:,:,acquisitionCounter) = T;
             disp(sprintf('\t%s', 'Got camera sample'));
-        
+            disp(camHTMs(:,:,acquisitionCounter));
             % get robot sample       
             robJoints(:,acquisitionCounter) = getJointPositions(robotSocket, robotInStream, robotOutStream );
             robHTMs(:,:,acquisitionCounter) = getHTM(robotSocket, robotInStream, robotOutStream );
             disp(sprintf('\t%s', 'Got robot sample'));
+            disp(robHTMs(:,:,acquisitionCounter));
             acquisitionCounter = acquisitionCounter + 1;
         else
             disp(sprintf('\t%s', 'Sample skipped: locator invisible'));

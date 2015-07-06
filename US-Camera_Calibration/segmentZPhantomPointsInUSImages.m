@@ -1,4 +1,4 @@
-function [c1, c2, c3, xmmPerPx, ymmPerPx, allImages] = segmentZPhantomPointsInUSImages(filenamePref, numImages, imgMask)
+function [c1, c2, c3, xmmPerPx, ymmPerPx, allImages, invalidImgs] = segmentZPhantomPointsInUSImages(filenamePref, numImages, imgMask)
 %SEGMENTZPHANTOMPOINTSINUSIMAGES Segments the Ultrasound images
 %   SEGMENTZPHANTOMPOINTSINUSIMAGES(FILENAMEPREF, NUMIMAGES)
 %   Reads in NUMIMAGES images with the prefix FILENAMEPREF and outputs the
@@ -40,25 +40,14 @@ xmmPerPxAll = zeros(1,numImages);
 ymmPerPx = 40.0 / 480; % known
 
 fhResult = figure;
+invalidImgs = false(numImages,1);
 
 for idx = 0:numImages-1
-    %delete(ims); delete(ims1);
     disp(['Segmentation of image.. ' num2str(imgMask(idx+1))]);
     % Reading the image
     allImages(:,:,idx+1) = imread([filenamePref num2str(imgMask(idx+1)) '.jpg']);
     I = allImages(:,:,idx+1);
-    
-    %ISeg = imread([filenameSegPref num2str(idx) '.jpg']);
-    % Showing the US image
-    
-    %fhComp = figure;
-    %subplot(1,2,1);
-    %imshow(I)
-    %title('Image from Ultrasound device')
-    %
-    % Implement here the segmentation
-    % ...
-    %
+
     
     % define ROI containing the 3 points
     fhRoi = figure;
@@ -72,7 +61,9 @@ for idx = 0:numImages-1
     % detect connected regions
     CC = bwconncomp(I,4);
     if CC.NumObjects ~= 3
-        error(['Detected ',num2str(CC.NumObjects),' objects! Discarding image.']);
+        warning(['Detected ',num2str(CC.NumObjects),' objects! Discarding image.']);
+        invalidImgs(idx+1) = true;
+        continue;
     end;
     % compute center of the connected regions
     c = zeros(3,2);
@@ -84,15 +75,6 @@ for idx = 0:numImages-1
     c2(idx+1,:) = c(2,:);
     c3(idx+1,:) = c(3,:);
     
-    %figure(fhComp);
-    %subplot(1,2,1);
-    %hold on;
-    %plot(c(:,2),c(:,1),'r+');
-    
-    % Showing the original thresholded image with centroids
-    %subplot(1,2,2);
-    %imshow(ISeg)
-    %title('Expected segmentation results')
     
     figure(fhResult);
     imshow(allImages(:,:,idx+1));
@@ -109,14 +91,18 @@ for idx = 0:numImages-1
     indL = find(sumRow, 1, 'last');
     widthPxUS = indL - indF + 1;
     xmmPerPxAll(idx+1) = 38.0 / widthPxUS;
-    pause(0.5);
+    pause(1);
 end
 
+% discard invalid images
+c1(invalidImgs,:) = [];
+c2(invalidImgs,:) = [];
+c3(invalidImgs,:) = [];
+allImages(:,:,invalidImgs) = [];
+xmmPerPxAll(invalidImgs) = [];
+
+
+% mean of xmmPerPx
 xmmPerPx = mean(xmmPerPxAll);
 
 close(fhResult);
-
-% Outputting all zeros - please modify it based on the segmentation above.
-%c1 = zeros(numImages,2);
-%c2 = zeros(numImages,2);
-%c3 = zeros(numImages,2);

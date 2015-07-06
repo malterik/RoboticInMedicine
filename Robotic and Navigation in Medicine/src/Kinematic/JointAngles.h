@@ -33,6 +33,7 @@ public:
 		}
 		return distance;
 	}
+
 private:
 	std::array<double,6> angles_;
 };

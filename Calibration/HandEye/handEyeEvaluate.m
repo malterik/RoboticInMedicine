@@ -1,21 +1,33 @@
 %% Evaluates the calibration
+% clear all;
+% close all;
+
 
 %% Definitions
-    % Calibration settings
-    cam2MarkerFile = '..\Data\Cam2Marker.mat';
-    base2EndeffectorFile = '..\Data\Base2Endeffector.mat';
+    % Input settings
+    cam2MarkerFile = 'camHTMs.mat';
+    base2EndeffectorFile = 'robHTMs.mat';
+
+    % Output settings
+    calibrationMatricesFile = 'handEyeData.mat';
+    robotToCamFileCSV = 'rob2cam.csv';
+    
+%% Initialization  
+    % load files
     load(cam2MarkerFile);
     load(base2EndeffectorFile);
     
+    Cam2Marker = camHTMs;
+    Base2Endeffector = robHTMs;
     nMeasurements = size(Cam2Marker,3);
-    nCalibration = 50;
+    nCalibration = nMeasurements;
     nTest = nMeasurements - nCalibration;
 
-%% Initialization  
     % scale camera data (robot data is provided in m whereas camera data is provided in mm)
     scalingFactor = 1*10^(-3);
     for i = 1:nMeasurements;
-        Cam2Marker(1:3,4,i) = Cam2Marker(1:3,4,i) * scalingFactor;        
+        Cam2Marker(1:3,4,i) = Cam2Marker(1:3,4,i) * scalingFactor;       
+        Base2Endeffector(1:3,4,i) = Base2Endeffector(1:3,4,i) * scalingFactor; 
     end
 
     % split data in calibration and test set
@@ -28,9 +40,9 @@
     % init buffers
     errorTranslations = zeros(length(MCalib), 1);
     errorRotations = zeros(length(MCalib), 1); 
-    skip = 3;
+    skip = 5;
     for i = skip:length(MCalib);
-        [X,Y] = handEyeErnst(MCalib(:,:,1:i), NCalib(:,:,1:i));
+        [X,Y] = handEyeErnstTwo(MCalib(:,:,1:i), NCalib(:,:,1:i));
 
         errorTranslationsLocal = zeros(length(MCalib), 1);
         errorRotationsLocal = zeros(length(MCalib), 1);    
@@ -67,3 +79,7 @@
     xlabel('Number of calibration frames');
     ylabel('Absolute rotational error / °');
     hold on;
+    
+%% Save files
+    save(calibrationMatricesFile, 'X', 'Y');
+    csvwrite(robotToCamFileCSV, Y);
