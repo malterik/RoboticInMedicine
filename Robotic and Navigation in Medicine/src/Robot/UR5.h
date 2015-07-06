@@ -72,6 +72,7 @@ public:
 
 	void doNeedlePlacement(vector<double> target, vector<double> window, matrix<double> needleTip);
 	bool needlePlacement(vector<double> target, vector<double> window_center, bool log_movement, bool move_interpolated);
+	bool needlePlacementTwo(vector<double> target, std::vector<vector<double>> window, vector<double> window_center, bool log_movement, bool move_interpolated);
 
 	
 	void waitUntilFinished(int pollTime);

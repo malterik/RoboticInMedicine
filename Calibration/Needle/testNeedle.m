@@ -4,7 +4,7 @@ close all;
 load('stylusEndEffector.mat');
 load('stylusNeedleTip.mat');
 load('handEyeData.mat');
-rob2needle = csvread('rob2needle.csv');
+rob2needle = csvread('Input/rob2needle.csv');
 
 stylusEndEffector_cam = stylusEndEffector;
 stylusNeedleTip_cam = stylusNeedleTip;

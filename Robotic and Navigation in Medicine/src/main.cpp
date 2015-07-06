@@ -43,8 +43,8 @@ int main(int argc, char* argv[])
 	robot.setRobotToCamTransformation(robot_to_cam_transformation);
 	robot.setRobotToNeedleTransformation(robot_to_needle_transformation);
 	robot.setPixelToProbeTransformation(pixel_to_probe);
-	robot.moveToHomePosition();
-	robot.waitUntilFinished(500);
+	//robot.moveToHomePosition();
+	//robot.waitUntilFinished(500);
 
 	// PREPARE DATA FOR NEEDLE PLACEMENT (i.e calculate target and window center in robot coordinates)
 	// transform tumor coordinates from camera to robot world
@@ -73,7 +73,8 @@ int main(int argc, char* argv[])
 	// NEEDLE PLACEMENT
 	bool log_movement = true;
 	bool move_interpolated = true;
-	robot.needlePlacement(tumor_position_rob, window_middle_rob, log_movement, move_interpolated);
+	//robot.needlePlacement(tumor_position_rob, window_middle_rob, log_movement, move_interpolated);
+	robot.needlePlacementTwo(tumor_position_rob, window_points_rob, window_middle_rob, log_movement, move_interpolated);
 
 	system("Pause");
 	return 0;

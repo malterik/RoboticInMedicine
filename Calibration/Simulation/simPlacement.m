@@ -30,10 +30,20 @@ close all;
     % Calculate middle of window in rob world
     windowMiddle_rob = mean(windowPointTranslations_rob);
     
+    windowLachs(1,:) = (windowMiddle_rob+windowPointTranslations_rob(1,:))/2;
+    windowLachs(2,:) = (windowMiddle_rob+windowPointTranslations_rob(2,:))/2;
+    windowLachs(3,:) = (windowMiddle_rob+windowPointTranslations_rob(3,:))/2;
+    windowLachs(4,:) = (windowMiddle_rob+windowPointTranslations_rob(4,:))/2;
+    windowLachs(5,:) = (windowLachs(1,:)+windowLachs(2,:))/2;
+    windowLachs(6,:) = (windowLachs(2,:)+windowLachs(3,:))/2;
+    windowLachs(7,:) = (windowLachs(3,:)+windowLachs(4,:))/2;
+    windowLachs(8,:) = (windowLachs(4,:)+windowLachs(1,:))/2;
+    
     % add window to plot
     figure(simFig);
     hold on;    
     plot3(windowPointTranslations_rob(:,1), windowPointTranslations_rob(:,2), windowPointTranslations_rob(:,3), 'ro');
+    plot3(windowLachs(:,1), windowLachs(:,2), windowLachs(:,3), 'ko');
     plot3(windowMiddle_rob(1), windowMiddle_rob(2), windowMiddle_rob(3), 'rx', 'MarkerSize', 25);
     fill3(windowPointTranslations_rob(:,1), windowPointTranslations_rob(:,2), windowPointTranslations_rob(:,3), 'r');
     alpha(0.1);
