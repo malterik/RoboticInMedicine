@@ -9,7 +9,7 @@
     timeout = 3000; % timeout for tcp reads
         
     % Output settings
-    startJointsFile = 'robStartJoints.mat'; % output file for robot joints
+    startJointsFile = 'Calibration\Data\robStartJoints.mat'; % output file for robot joints
 
 %% Initialization  
     % Connect to RobServer, if necessary

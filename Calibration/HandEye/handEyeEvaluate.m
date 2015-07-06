@@ -5,12 +5,12 @@
 
 %% Definitions
     % Input settings
-    cam2MarkerFile = 'camHTMs.mat';
-    base2EndeffectorFile = 'robHTMs.mat';
+    cam2MarkerFile = 'Calibration\Data\camHTMs.mat';
+    base2EndeffectorFile = 'Calibration\Data\robHTMs.mat';
 
     % Output settings
-    calibrationMatricesFile = 'handEyeData.mat';
-    robotToCamFileCSV = 'rob2cam.csv';
+    calibrationMatricesFile = 'Calibration\Data\handEyeData.mat';
+    robotToCamFileCSV = 'Input\rob2cam.csv';
     
 %% Initialization  
     % load files

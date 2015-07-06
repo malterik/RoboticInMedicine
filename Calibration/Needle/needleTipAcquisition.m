@@ -15,7 +15,7 @@
     camLocator = 'NeedleAdapter3'; % locator name  
     
     % Output settings
-    camHTMsFile = 'needleEndHTMs.mat'; % output file for camera HTMs
+    camHTMsFile = 'Calibration\Data\needleEndHTMs.mat'; % output file for camera HTMs
 
 %% Initialization
     % Connect to CamBarServer, if necessary

@@ -4,7 +4,7 @@
 
 %% Definitions
     % Calibration settings
-    maxAngle = 15*pi/180; % maximum angle of rotation in degrees
+    maxAngle = 12*pi/180; % maximum angle of rotation in degrees
     maxTranslation = 0.08; % maxiumum translation in meters
     nMeasurements = 50; % number of measurements
   
@@ -22,12 +22,12 @@
     robotSpeed = 10; % speed of robot
         
     % Input settings
-    defaultJointsFile = 'robStartJoints.mat';
+    defaultJointsFile = 'Calibration\Data\robStartJoints.mat';
     
     % Output settings
-    robJointsFile = 'robJoints.mat'; % output file for robot joints
-    robHTMsFile = 'robHTMs.mat'; % output file for robot HTMs
-    camHTMsFile = 'camHTMs.mat'; % output file for camera HTMs
+    robJointsFile = 'Calibration\Data\robJoints.mat'; % output file for robot joints
+    robHTMsFile = 'Calibration\Data\robHTMs.mat'; % output file for robot HTMs
+    camHTMsFile = 'Calibration\Data\camHTMs.mat'; % output file for camera HTMs
 
 %% Initialization
     % Connect to CamBarServer, if necessary
@@ -84,7 +84,7 @@
 
         % wait until position is reached
         waitForCompletion(robotSocket, robotInStream, robotOutStream, 'Waiting for robot to reach new calibration pose', 1);
-        pause(0.2); % wait for stable position
+        pause(0.5); % wait for stable position
         
         % get cam sample
         [T, timestamp, isVisible, message] = getLocatorTransformMatrix(camSocket, camInStream, camOutStream, camLocator);
