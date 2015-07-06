@@ -12,7 +12,7 @@
     camLocator = 'stylusRNM'; % locator name
 
     % Output settings
-    camHTMFile = 'needleTip.csv'; % output file for robot joints
+    camHTMFile = 'Input\tumorCenter.csv'; % output file for robot joints
 
 %% Initialization
     % Connect to CamBarServer, if necessary
@@ -37,4 +37,4 @@
 
 %% Save files
      csvwrite(camHTMFile, camHTM);
-     save('endeffector.mat', 'camHTM');
+     save('Calibration\Data\endeffector.mat', 'camHTM');

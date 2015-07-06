@@ -4,8 +4,8 @@
 
 %% Definitions
     % Network settrings
-    robotIP = '192.168.56.101'; % robot ip
-%     robotIP = '134.28.45.95'; % robot ip
+
+    robotIP = '134.28.45.95'; % robot ip
     robotPort = 5005; % robot port    
     timeout = 3000; % timeout for tcp reads
         

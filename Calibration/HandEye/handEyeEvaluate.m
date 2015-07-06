@@ -1,6 +1,6 @@
 %% Evaluates the calibration
-% clear all;
-% close all;
+clear all;
+close all;
 
 
 %% Definitions

@@ -15,8 +15,8 @@
     camLocator = 'stylusRNM'; % locator name  
     
     % Output settings
-    windowHTMsFile = 'windowHTMs.mat'; 
-    windowPointsFile = 'windowPoints.csv'; % output file for camera HTMs
+    windowHTMsFile = 'Calibration\Data\windowHTMs.mat'; 
+    windowPointsFile = 'Input\windowPoints.csv'; % output file for camera HTMs
 
 %% Initialization
     % Connect to CamBarServer, if necessary

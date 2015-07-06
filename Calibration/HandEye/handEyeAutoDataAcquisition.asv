@@ -19,7 +19,7 @@
     camLocator = 'NeedleAdapter3'; % locator name
     
     % Robot settings
-    robotSpeed = 20; % speed of robot
+    robotSpeed = 0; % speed of robot
         
     % Input settings
     defaultJointsFile = 'Calibration\Data\robStartJoints.mat';

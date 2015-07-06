@@ -4,12 +4,12 @@ close all;
 
 %% Definitions   
     % Input settings
-    tipHTMsFile = 'needleTipHTMs.mat'; % contains HTMs of needle tips
-    endHTMsFile = 'needleEndHTMs.mat'; % contains HTMs of needle ends
-    HandEyeFile = 'handEyeData.mat'; % contains the hand eye calibration matrices
+    tipHTMsFile =  'Calibration\Data\needleTipHTMs.mat'; % contains HTMs of needle tips
+    endHTMsFile =  'Calibration\Data\needleEndHTMs.mat'; % contains HTMs of needle ends
+    HandEyeFile =  'Calibration\Data\handEyeData.mat'; % contains the hand eye calibration matrices
     
     % Output settings
-    rob2NeedleHTMFileCSV = 'Calibration\Data\rob2needle.csv'; 
+    rob2NeedleHTMFileCSV = 'Input\rob2needle.csv'; 
     
 %% Initialization
     % load files

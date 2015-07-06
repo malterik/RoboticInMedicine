@@ -15,7 +15,7 @@
     camLocator = 'NeedleAdapter3'; % locator name  
     
     % Output settings
-    camHTMsFile = 'Calibration\Data\needleEndHTMs.mat'; % output file for camera HTMs
+    camHTMsFile = 'Calibration\Data\needleTipHTMs.mat'; % output file for camera HTMs
 
 %% Initialization
     % Connect to CamBarServer, if necessary
@@ -56,5 +56,5 @@
     end;
 
 %% Save files
-    needleEndHTMs = camNeedleHTMs(:,:,1:(acquisitionCounter-1));
-    save(camHTMsFile, 'needleEndHTMs');
+    needleTipHTMs = camNeedleHTMs(:,:,1:(acquisitionCounter-1));
+    save(camHTMsFile, 'needleTipHTMs');
