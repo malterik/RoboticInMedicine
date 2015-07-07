@@ -1,8 +1,10 @@
 %% Calibrate endeffector to needle tip transformation
-clear all;
-close all;
+% clear all;
+% close all;
 
 %% Definitions   
+    show_plot = 0;
+
     % Input settings
     tipHTMsFile =  'Calibration\Data\needleTipHTMs.mat'; % contains HTMs of needle tips
     endHTMsFile =  'Calibration\Data\needleEndHTMs.mat'; % contains HTMs of needle ends
@@ -22,8 +24,8 @@ close all;
     needleEndHTMs(1:3,4,:) = needleEndHTMs(1:3,4,:) / 1000;
     
     % calibrate needle tip and end pivot vectors
-    [ pCalTip, pPivotTip ] = solveNC(needleTipHTMs);
-    [ pCalEnd, pPivotEnd ] = solveNC(needleEndHTMs);
+    [ pCalTip, pPivotTip, errorTip ] = solveNC(needleTipHTMs(:,:,1:10), show_plot);
+    [ pCalEnd, pPivotEnd, errorEnd ] = solveNC(needleEndHTMs(:,:,1:10), show_plot);
     
     % create cam and rob pose from hand eye calibration matrices
     camPose = eye(4);
@@ -45,8 +47,7 @@ close all;
     [U,S,V] = svd(needleTipHTM_rob(1:3,1:3));
     needleTipHTM_rob = [U*V' needleTipHTM_rob(1:3,4); 0 0 0 1];    
     needleEndPoint_rob = Y*[pCalEnd;1];
-    needleEndPoint_rob = needleEndPoint_rob(1:3); 
-    
+    needleEndPoint_rob = needleEndPoint_rob(1:3);     
      
     % create HTM for needle tip that has its z axis aligned to needle with
     % needle direction

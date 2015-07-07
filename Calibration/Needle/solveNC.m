@@ -1,4 +1,4 @@
-function [ pCal, pPivot ] = solveNC( poses )
+function [ pCal, pPivot, error ] = solveNC( poses, show_plot )
 %solveNC Needle tip calibration
 %
 %   Performs needle tip calibration using hot spot/pivot calibration procedure. 
@@ -34,8 +34,22 @@ function [ pCal, pPivot ] = solveNC( poses )
     % solve equations
     x = linsolve(A,b);
     
+    error = norm(A*x-b);
+    
     % set output
     pCal = x(1:3);
     pPivot = x(4:6);
+    
+    if (show_plot)
+        fig = figure();
+        for i = 1:n;
+            endpoint = poses(:,:,i) * [pCal' 1]';
+            plotHTM(poses(:,:,i), fig, 0.05);
+            figure(fig);
+            hold on;
+                plot3([poses(1,4,i) endpoint(1)], [poses(2,4,i) endpoint(2)], [poses(3,4,i) endpoint(3)], 'k-');
+            hold off;
+        end
+    end 
 end
 
