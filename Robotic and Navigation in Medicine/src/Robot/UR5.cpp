@@ -833,10 +833,10 @@ bool UR5::needlePlacementTwo(vector<double> target, std::vector<vector<double>> 
 
 	std::vector<vector<double>> window_points;
 	window_points.push_back(window_center);
-	window_points.push_back((window_center + window[0]) / 2);
-	window_points.push_back((window_center + window[1]) / 2);
-	window_points.push_back((window_center + window[2]) / 2);
-	window_points.push_back((window_center + window[3]) / 2);
+	window_points.push_back((window_center + window[0]) / 4);
+	window_points.push_back((window_center + window[1]) / 4);
+	window_points.push_back((window_center + window[2]) / 4);
+	window_points.push_back((window_center + window[3]) / 4);
 	window_points.push_back((window_points[0] + window_points[1]) / 2);
 	window_points.push_back((window_points[1] + window_points[2]) / 2);
 	window_points.push_back((window_points[2] + window_points[3]) / 2);

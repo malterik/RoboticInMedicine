@@ -71,7 +71,7 @@ surf(rmsDistFromMean(4)*x+meanPointsPhantom(1,4),rmsDistFromMean(4)*y+meanPoints
 probePoses = importProbePoses('data\ultrasoundImagesAndPoses\fileoutpos.txt');
 
 % take only the measurements with valid pose
-imgMask = (1:20).*(probePoses(:,2)' == 1);
+imgMask = (1:size(probePoses,1)).*(probePoses(:,2)' == 1);
 imgMask(imgMask==0) = [];
 probePoses = probePoses(imgMask, 3:end);
 

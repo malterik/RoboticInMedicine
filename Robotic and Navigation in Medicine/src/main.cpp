@@ -25,6 +25,9 @@
 
 int main(int argc, char* argv[])
 {	
+
+
+	
 	// READ FILES
 	CSVParser csvParser;
 	boost::numeric::ublas::matrix<double> robot_to_cam_transformation = csvParser.readHTM(std::string(INPUT_FOLDER) + "rob2cam.csv");
@@ -38,17 +41,15 @@ int main(int argc, char* argv[])
 	// INITIALIZE ROBOT
 	UR5 robot;
 	robot.connectToRobot(ROBOT_IP_LABOR, ROBOT_PORT);
-	robot.setSpeed(3);
+	robot.setSpeed(2);
 	robot.disableLinearMovement();
 	robot.setRobotToCamTransformation(robot_to_cam_transformation);
 	robot.setRobotToNeedleTransformation(robot_to_needle_transformation);
-	std::cout << "Pixel to Probe 1: " << pixel_to_probe << std::endl << std::endl;
-	std::cout << "Probe 1: " << probe_pose << std::endl << std::endl;
 	robot.setPixelToProbeTransformation(pixel_to_probe);
 
-	vector<double> usPose = robot.convertCamToRobPose(prod(probe_pose,robot.convertPixelToProbe(278, 50)));
+	vector<double> usPose = robot.convertCamToRobPose(prod(probe_pose,robot.convertPixelToProbe(363, 119)));
 	std::cout << "usPose: " << usPose << std::endl;
-	std::cout << "usPose CameraCoord: " << prod(probe_pose, robot.convertPixelToProbe(278, 50)) << std::endl;
+	std::cout << "usPose CameraCoord: " << prod(probe_pose, robot.convertPixelToProbe(363, 119)) << std::endl;
 	//std::cout << "usPose USCoord: " << robot.convertPixelToProbe(412, 62) << std::endl;
 	//robot.moveToHomePosition();
 	//robot.waitUntilFinished(500);
@@ -80,10 +81,12 @@ int main(int argc, char* argv[])
 	// NEEDLE PLACEMENT
 	bool log_movement = true;
 	bool move_interpolated = false;
-	//robot.needlePlacement(tumor_position_rob, window_middle_rob, log_movement, move_interpolated);
-	robot.needlePlacementTwo(tumor_position_rob, window_points_rob, window_middle_rob, log_movement, move_interpolated);
+	//robot.needlePlacement(usPose, window_middle_rob, log_movement, move_interpolated);
+	robot.needlePlacementTwo(usPose, window_points_rob, window_middle_rob, log_movement, move_interpolated);
+
 
 	system("Pause");
+
 	return 0;
 }
 
