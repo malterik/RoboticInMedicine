@@ -3,7 +3,7 @@
 % close all;
 
 %% Definitions   
-    show_plot = 0;
+    show_plot = 1;
 
     % Input settings
     tipHTMsFile =  'Calibration\Data\needleTipHTMs.mat'; % contains HTMs of needle tips

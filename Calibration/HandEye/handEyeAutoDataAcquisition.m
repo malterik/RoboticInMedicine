@@ -4,7 +4,7 @@
 
 %% Definitions
     % Calibration settings
-    maxAngle = 12*pi/180; % maximum angle of rotation in degrees
+    maxAngle = 15*pi/180; % maximum angle of rotation in degrees
     maxTranslation = 0.08; % maxiumum translation in meters
     nMeasurements = 50; % number of measurements
   
@@ -19,7 +19,7 @@
     camLocator = 'NeedleAdapter3'; % locator name
     
     % Robot settings
-    robotSpeed = 20; % speed of robot
+    robotSpeed = 5; % speed of robot
         
     % Input settings
     defaultJointsFile = 'Calibration\Data\robStartJoints.mat';
@@ -84,7 +84,7 @@
 
         % wait until position is reached
         waitForCompletion(robotSocket, robotInStream, robotOutStream, 'Waiting for robot to reach new calibration pose', 1);
-        pause(0.5); % wait for stable position
+        pause(2.0); % wait for stable position
         
         % get cam sample
         [T, timestamp, isVisible, message] = getLocatorTransformMatrix(camSocket, camInStream, camOutStream, camLocator);
