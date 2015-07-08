@@ -3,7 +3,7 @@
 
 #include <opencv2\core\core.hpp>
 
-#define IMG_PATH "fileout_0.jpg"
+#define IMG_PATH "..\\Input\\fileoutpos.txt_0.jpg"
 class USHandler
 {
 public:

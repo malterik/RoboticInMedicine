@@ -17,8 +17,10 @@ public:
 	std::array<double, 6> getArray();
 	void setArray(std::array<double, 6> arr);
 	void setAngles(JointAngles angles);
+	void setIndex(int index, double value);
 	int size() const;
-	
+	char* toString();
+
 	double operator[](int i) const {
 		return angles_[i];
 	}

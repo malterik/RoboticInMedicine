@@ -4,7 +4,7 @@
 
 %% Definitions
     % Calibration settings
-    nMeasurements = 50; % number of measurements
+    nMeasurements = 4; % number of measurements
   
     % Network settrings
 	camIP = '134.28.45.63'; % camera ip
