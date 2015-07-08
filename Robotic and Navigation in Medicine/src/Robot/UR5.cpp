@@ -437,7 +437,7 @@ bool UR5::interpolateLine(JointAngles startAngles, vector<double> endPosition, d
 
 	for (int i = 1; i < (steps + 1); i++)
 	{
-		vector<double> position_rob = endeEffectorTranslation + direction_normed*i*step_size;
+		vector<double> position_rob = endeEffectorTranslation + (direction_normed*i*step_size);
 		matrix<double> pose_rob = MathTools::composeMatrix(endeEffectorRotation, position_rob);
 
 		IKResult ikResult = inverseKinematics.computeInverseKinematics(pose_rob);
@@ -447,14 +447,32 @@ bool UR5::interpolateLine(JointAngles startAngles, vector<double> endPosition, d
 			if (result)
 			{
 				JointAngles jA = result->nearestSolution;
-
+				jA.toString();
+				lastAngles.toString();
+				
+				
+				
 				double angleChange = MathTools::getChangeInRotation(jA, lastAngles);
+				std::cout << angleChange << "  " << max_change_in_rotation << "  step " << i << " of " << steps + 1 << std::endl;
 				if (angleChange > max_change_in_rotation)
 				{
-					// max angle constraint violated
-					return false;
-				}
+					//Check if the Angle is just rotated by 360 degrees
+					for (int k = 0; k < jA.size(); k++) {
+						//std::cout << "Angle change ???:  " << (2 * PI - abs(jA[k])) << "-" << lastAngles[k] << "   " << (2 * PI - abs(jA[k])) - lastAngles[k] << std::endl;
+						if (((2 * PI - abs(jA[k])) - lastAngles[k]) < (max_change_in_rotation / 6)) {
+							jA.setIndex(k, 2 * PI - abs(jA[k]));
+							std::cout << "change angle from " << jA[k] << " to " << 2 * PI - abs(jA[k]) << std::endl;
+						}
 
+
+					}
+					angleChange =  MathTools::getChangeInRotation(jA, lastAngles);
+					if (angleChange > max_change_in_rotation) {
+						// max angle constraint violated
+						return false;
+					}
+					
+				}
 				lineJointAngles.push_back(jA);
 				lastAngles = jA;
 			}
@@ -833,14 +851,14 @@ bool UR5::needlePlacementTwo(vector<double> target, std::vector<vector<double>> 
 
 	std::vector<vector<double>> window_points;
 	window_points.push_back(window_center);
-	window_points.push_back((window_center + window[0]) / 4);
-	window_points.push_back((window_center + window[1]) / 4);
-	window_points.push_back((window_center + window[2]) / 4);
-	window_points.push_back((window_center + window[3]) / 4);
-	window_points.push_back((window_points[0] + window_points[1]) / 2);
-	window_points.push_back((window_points[1] + window_points[2]) / 2);
-	window_points.push_back((window_points[2] + window_points[3]) / 2);
-	window_points.push_back((window_points[3] + window_points[1]) / 2);
+	//window_points.push_back((window_center + window[0]) / 4);
+	//window_points.push_back((window_center + window[1]) / 4);
+	//window_points.push_back((window_center + window[2]) / 4);
+	//window_points.push_back((window_center + window[3]) / 4);
+	//window_points.push_back((window_points[0] + window_points[1]) / 2);
+	//window_points.push_back((window_points[1] + window_points[2]) / 2);
+	//window_points.push_back((window_points[2] + window_points[3]) / 2);
+	//window_points.push_back((window_points[3] + window_points[1]) / 2);
 	
 
 	matrix<double> pose_rob;
