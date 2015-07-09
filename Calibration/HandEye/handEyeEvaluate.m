@@ -21,10 +21,8 @@ close all;
     load(cam2MarkerFile);
     load(base2EndeffectorFile);
     
-%     Cam2Marker = camHTMs;
-%     Base2Endeffector = robHTMs;
-        Base2Endeffector = composedRobHTMs;
-    Cam2Marker = composedCamHTMs;
+    Cam2Marker = camHTMs;
+    Base2Endeffector = robHTMs;
     nMeasurements = size(Cam2Marker,3);
     nCalibration = nMeasurements;
     nTest = nMeasurements - nCalibration;
@@ -118,22 +116,22 @@ close all;
         errorRot(j) = norm(err(1:3,4));
     end
 
-   % Translational error
-    figure();
-    subplot(2,1,1);
-    plot(skip:length(MCalib), (1/scalingFactor)*errorTrans(skip:length(errorTrans)), 'bo');
-    grid on;
-    xlabel('Number of calibration frames');
-    ylabel('Absolute translational error / mm');
-    hold on;
-
-    % Rotational error
-    subplot(2,1,2);
-    plot(skip:length(MCalib), errorRot(skip:length(errorRot)), 'bo');
-    grid on;
-    xlabel('Number of calibration frames');
-    ylabel('Absolute rotational error / °');
-    hold on;
+%    % Translational error
+%     figure();
+%     subplot(2,1,1);
+%     plot(skip:length(MCalib), (1/scalingFactor)*errorTrans(skip:length(errorTrans)), 'bo');
+%     grid on;
+%     xlabel('Number of calibration frames');
+%     ylabel('Absolute translational error / mm');
+%     hold on;
+% 
+%     % Rotational error
+%     subplot(2,1,2);
+%     plot(skip:length(MCalib), errorRot(skip:length(errorRot)), 'bo');
+%     grid on;
+%     xlabel('Number of calibration frames');
+%     ylabel('Absolute rotational error / °');
+%     hold on;
     
 %% Save files
     save(calibrationMatricesFile, 'X', 'Y');
