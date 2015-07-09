@@ -24,6 +24,7 @@ close all;
     Cam2Marker = camHTMs;
     Base2Endeffector = robHTMs;
     nMeasurements = size(Cam2Marker,3);
+    nMeasurements = 38;
     nCalibration = nMeasurements;
     nTest = nMeasurements - nCalibration;
 
