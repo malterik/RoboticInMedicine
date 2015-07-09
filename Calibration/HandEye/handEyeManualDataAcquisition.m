@@ -16,10 +16,10 @@
     timeout = 3000; % timeout for tcp reads
     
     % Camera settings
-    camLocator = 'RobAdapter'; % locator name
+    camLocator = 'NeedleGRP3'; % locator name
     
     % Robot settings
-    robotSpeed = 100; % speed of robot
+    robotSpeed = 5; % speed of robot
         
     % Input settings
     defaultJointsFile = 'Data\robStartJoints.mat';

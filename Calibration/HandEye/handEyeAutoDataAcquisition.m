@@ -4,9 +4,9 @@
 
 %% Definitions
     % Calibration settings
-    maxAngle = 15*pi/180; % maximum angle of rotation in degrees
-    maxTranslation = 0.08; % maxiumum translation in meters
-    nMeasurements = 50; % number of measurements
+    maxAngle = 10*pi/180; % maximum angle of rotation in degrees
+    maxTranslation = 0.12; % maxiumum translation in meters
+    nMeasurements = 30; % number of measurements
   
     % Network settrings
     robotIP = '134.28.45.95'; % robot ip
@@ -16,7 +16,7 @@
     timeout = 3000; % timeout for tcp reads
     
     % Camera settings
-    camLocator = 'NeedleAdapter3'; % locator name
+    camLocator = 'NeedleGRP4'; % locator name
     
     % Robot settings
     robotSpeed = 5; % speed of robot

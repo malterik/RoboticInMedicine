@@ -12,10 +12,10 @@
     timeout = 3000; % timeout for tcp reads
     
     % Camera settings
-    camLocator = 'NeedleAdapter3'; % locator name  
+    camLocator = 'NeedleGRP4'; % locator name  
     
     % Output settings
-    camHTMsFile = 'Calibration\Data\needleTipHTMs.mat'; % output file for camera HTMs
+    camHTMsFile = 'Calibration\Data\needleEndHTMs.mat'; % output file for camera HTMs
 
 %% Initialization
     % Connect to CamBarServer, if necessary
@@ -56,5 +56,5 @@
     end;
 
 %% Save files
-    needleTipHTMs = camNeedleHTMs(:,:,1:(acquisitionCounter-1));
-    save(camHTMsFile, 'needleTipHTMs');
+    needleEndHTMs = camNeedleHTMs(:,:,1:(acquisitionCounter-1));
+    save(camHTMsFile, 'needleEndHTMs');

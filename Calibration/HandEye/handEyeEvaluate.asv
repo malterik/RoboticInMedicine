@@ -5,8 +5,13 @@ close all;
 
 %% Definitions
     % Input settings
-    cam2MarkerFile = 'Calibration\Data\camHTMs.mat';
-    base2EndeffectorFile = 'Calibration\Data\robHTMs.mat';
+%     cam2MarkerFile = 'Calibration\Data\camHTMs.mat';
+%     base2EndeffectorFile = 'Calibration\Data\robHTMs.mat';
+        cam2MarkerFile = 'Calibration/Data/camHTMsComp.mat';
+    base2EndeffectorFile = 'Calibration/Data/robHTMsComp.mat';
+    
+    Base2Endeffector = composedRobHTMs;
+    Cam2Marker = 
 
     % Output settings
     calibrationMatricesFile = 'Calibration\Data\handEyeData.mat';
@@ -80,7 +85,23 @@ close all;
     ylabel('Absolute rotational error / °');
     hold on;
     
+       % Translational error
+    subplot(2,1,1);
+    plot(skip:length(MCalib), (1/scalingFactor)*errorTranslations(skip:length(errorRotations)), 'bo');
+    grid on;
+    xlabel('Number of calibration frames');
+    ylabel('Absolute translational error / mm');
+    hold on;
+
     
+    
+    % Rotational error
+    subplot(2,1,2);
+    plot(skip:length(MCalib), errorRotations(skip:length(errorRotations)), 'bo');
+    grid on;
+    xlabel('Number of calibration frames');
+    ylabel('Absolute rotational error / °');
+    hold on;
 
 
     errorTrans = zeros(length(MCalib), 1);
@@ -92,12 +113,26 @@ close all;
         [U,S,V] = svd(err(1:3,1:3));
         err = [U*V' err(1:3,4); 0 0 0 1];
         r = vrrotmat2vec(err(1:3,1:3));
-        errorRotationsLocal(j) = abs(r(4))*180/pi;
-        errorTranslationsLocal(j) = norm(err(1:3,4));
+        errorTrans(j) = abs(r(4))*180/pi;
+        errorRot(j) = norm(err(1:3,4));
     end
 
+   % Translational error
     figure();
-    plot
+    subplot(2,1,1);
+    plot(skip:length(MCalib), (1/scalingFactor)*errorTrans(skip:length(errorTrans)), 'bo');
+    grid on;
+    xlabel('Number of calibration frames');
+    ylabel('Absolute translational error / mm');
+    hold on;
+
+    % Rotational error
+    subplot(2,1,2);
+    plot(skip:length(MCalib), errorRot(skip:length(errorRot)), 'bo');
+    grid on;
+    xlabel('Number of calibration frames');
+    ylabel('Absolute rotational error / °');
+    hold on;
     
 %% Save files
     save(calibrationMatricesFile, 'X', 'Y');

@@ -5,8 +5,12 @@ close all;
 
 %% Definitions
     % Input settings
-    cam2MarkerFile = 'Calibration\Data\camHTMs.mat';
-    base2EndeffectorFile = 'Calibration\Data\robHTMs.mat';
+%     cam2MarkerFile = 'Calibration\Data\camHTMs.mat';
+%     base2EndeffectorFile = 'Calibration\Data\robHTMs.mat';
+        cam2MarkerFile = 'Calibration/Data/camHTMsComp.mat';
+    base2EndeffectorFile = 'Calibration/Data/robHTMsComp.mat';
+    
+
 
     % Output settings
     calibrationMatricesFile = 'Calibration\Data\handEyeData.mat';
@@ -17,8 +21,10 @@ close all;
     load(cam2MarkerFile);
     load(base2EndeffectorFile);
     
-    Cam2Marker = camHTMs;
-    Base2Endeffector = robHTMs;
+%     Cam2Marker = camHTMs;
+%     Base2Endeffector = robHTMs;
+        Base2Endeffector = composedRobHTMs;
+    Cam2Marker = composedCamHTMs;
     nMeasurements = size(Cam2Marker,3);
     nCalibration = nMeasurements;
     nTest = nMeasurements - nCalibration;
