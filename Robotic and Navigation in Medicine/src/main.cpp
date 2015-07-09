@@ -41,13 +41,13 @@ int main(int argc, char* argv[])
 	// INITIALIZE ROBOT
 	UR5 robot;
 	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
-	robot.setSpeed(80);
+	robot.setSpeed(5);
 	robot.disableLinearMovement();
 	robot.setRobotToCamTransformation(robot_to_cam_transformation);
 	robot.setRobotToNeedleTransformation(robot_to_needle_transformation);
 	robot.setPixelToProbeTransformation(pixel_to_probe);
-	robot.moveToHomePosition();
-	robot.waitUntilFinished(500);
+	//robot.moveToHomePosition();
+	//robot.waitUntilFinished(500);
 	vector<double> usPose = robot.convertCamToRobPose(prod(probe_pose,robot.convertPixelToProbe(363, 119)));
 	std::cout << "usPose: " << usPose << std::endl;
 	std::cout << "usPose CameraCoord: " << prod(probe_pose, robot.convertPixelToProbe(363, 119)) << std::endl;
@@ -84,7 +84,8 @@ int main(int argc, char* argv[])
 	bool move_interpolated = true;
 	//robot.moveToPosition(0.4,0.2,0.4);
 	//robot.needlePlacement(usPose, window_middle_rob, log_movement, move_interpolated);
-	robot.needlePlacementTwo(usPose, window_points_rob, window_middle_rob, log_movement, move_interpolated);
+	//robot.needlePlacementTwo(usPose, window_points_rob, window_middle_rob, log_movement, move_interpolated);
+	robot.needlePlacementThree(usPose, window_points_rob, window_middle_rob, log_movement, move_interpolated);
 
 
 	system("Pause");
