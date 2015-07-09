@@ -837,6 +837,93 @@ matrix<double> UR5::getNeedlePose()
 /// <param name="target">The target.</param>
 /// <param name="window_center">The window_center.</param>
 /// <param name="log_movement">Movement is logged to CSV files after being complete dif set to <c>true</c> [log_movement].</param>
+bool UR5::needlePlacementThree(vector<double> target, std::vector<vector<double>> window, vector<double> window_center, bool log_movement, bool move_interpolated)
+{
+	CSVParser csvParser;
+	InverseKinematics inverseKinematics;
+	DirectKinematics directKinematics;
+	bool success = true;
+
+	// PLANNING
+	double distance = 0.05; // minimum distance from window to needle for outside position
+
+	vector<double> window_to_target = target - window_center; // vector from middle to tumor point
+
+	vector<double> direction = (-window_to_target) / norm_2(window_to_target);	// normed vector from window center pointing away from target
+	matrix<double> rot = orientateAlongVector(window_to_target); // desired needle rotation for outside pose
+
+	// calculate pose with increased distance from window center
+	vector<double> position = window_center + direction*distance;
+
+	// convert to robot coordinates
+	matrix<double> pose_rob = convertNeedleToRobPose(MathTools::composeMatrix(rot, position));
+
+	// comput inverse kinematics
+	IKResult ikResult = inverseKinematics.computeInverseKinematics(pose_rob);
+	JointAngles angles;
+
+	if (ikResult.solutions.size() > 0) {
+		IKResult* result = path_planner_.chooseNearest(getJoints("rad"), path_planner_.checkForValidConfigurations(ikResult));
+		if (result)
+		{
+			angles = (result->nearestSolution);
+		}
+		else
+		{
+			std::cout << "No soultion" << std::endl;
+			return false;
+		}
+	}
+
+	// STEP 1: MOVE TO POSE OUTSIDE OF BOX
+	std::cout << "outside_pose_pre: " << pose_rob << std::endl;
+	success = moveAndWait(&UR5::moveLinear, pose_rob, pose_rob);
+	//success = moveAndWait(&UR5::setJoints, angles, pose_rob);
+	if (!success)
+	{
+		return false;
+	}
+	if (log_movement)
+	{
+		csvParser.writeHTM(pose_rob, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_outside_matrix.csv");
+	}
+	std::cout << "outside_pose: " << pose_rob << std::endl;
+
+	// STEP 2: MOVE INTO TUMOR ON STRAIGHT LINE
+	matrix<double> final_pose;
+	// use linear movement function provided by robot
+	final_pose = convertNeedleToRobPose(MathTools::composeMatrix(MathTools::getRotation(getNeedlePose()), target));
+	success = moveAndWait(&UR5::moveLinear, final_pose, final_pose);
+	if (!success)
+	{
+		return false;
+	}
+	if (log_movement)
+	{
+		csvParser.writeHTM(final_pose, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_final_matrix0.csv");
+	}
+
+	// STEP 3: MOVE OUTSIDE AGAIN
+	// use linear movement function provided by robot
+	success = moveAndWait(&UR5::moveLinear, pose_rob, pose_rob);
+	if (!success)
+	{
+		return false;
+	}
+	if (log_movement)
+	{
+		csvParser.writeHTM(final_pose, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_final_matrix0.csv");
+	}
+
+	return true;
+}
+
+/// <summary>
+/// Places the needle.
+/// </summary>
+/// <param name="target">The target.</param>
+/// <param name="window_center">The window_center.</param>
+/// <param name="log_movement">Movement is logged to CSV files after being complete dif set to <c>true</c> [log_movement].</param>
 bool UR5::needlePlacementTwo(vector<double> target, std::vector<vector<double>> window, vector<double> window_center, bool log_movement, bool move_interpolated)
 {
 	CSVParser csvParser;
