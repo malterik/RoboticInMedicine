@@ -4,8 +4,8 @@
 
 %% Definitions
     % Calibration settings
-    maxAngle = 10*pi/180; % maximum angle of rotation in degrees
-    maxTranslation = 0.12; % maxiumum translation in meters
+    maxAngle = 8*pi/180; % maximum angle of rotation in degrees
+    maxTranslation = 0.10; % maxiumum translation in meters
     nMeasurements = 30; % number of measurements
   
     % Network settrings

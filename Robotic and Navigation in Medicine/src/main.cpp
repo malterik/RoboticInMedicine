@@ -35,22 +35,24 @@ int main(int argc, char* argv[])
 	//boost::numeric::ublas::matrix<double> marker_position = csvParser.readHTM(std::string(INPUT_FOLDER) + "camHTM.csv");
 	boost::numeric::ublas::matrix<double> pixel_to_probe = csvParser.readHTM(std::string(INPUT_FOLDER) + "ImageToProbe.csv");
 	boost::numeric::ublas::matrix<double> probe_pose = csvParser.readHTM(std::string(INPUT_FOLDER) + "probe.csv");
-	boost::numeric::ublas::vector<double> tumor_position = csvParser.readVector3D(std::string(INPUT_FOLDER) + "tumorCenter.csv");
+	boost::numeric::ublas::vector<double> tumor_position = csvParser.readVector3D(std::string(INPUT_FOLDER) + "y.csv");
 	std::vector<boost::numeric::ublas::vector<double>> window_points = csvParser.readWindow(std::string(INPUT_FOLDER) + "windowPoints.csv");
 	
+
+
 	// INITIALIZE ROBOT
 	UR5 robot;
-	robot.connectToRobot(ROBOT_IP_LOCAL, ROBOT_PORT);
-	robot.setSpeed(5);
+	robot.connectToRobot(ROBOT_IP_LABOR, ROBOT_PORT);
+	robot.setSpeed(1);
 	robot.disableLinearMovement();
 	robot.setRobotToCamTransformation(robot_to_cam_transformation);
 	robot.setRobotToNeedleTransformation(robot_to_needle_transformation);
 	robot.setPixelToProbeTransformation(pixel_to_probe);
 	//robot.moveToHomePosition();
 	//robot.waitUntilFinished(500);
-	vector<double> usPose = robot.convertCamToRobPose(prod(probe_pose,robot.convertPixelToProbe(363, 119)));
+	vector<double> usPose = robot.convertCamToRobPose(prod(probe_pose,robot.convertPixelToProbe(318, 435)));
 	std::cout << "usPose: " << usPose << std::endl;
-	std::cout << "usPose CameraCoord: " << prod(probe_pose, robot.convertPixelToProbe(363, 119)) << std::endl;
+	std::cout << "usPose CameraCoord: " << prod(probe_pose, robot.convertPixelToProbe(318, 435)) << std::endl;
 	//std::cout << "usPose USCoord: " << robot.convertPixelToProbe(412, 62) << std::endl;
 	//robot.moveToHomePosition();
 	//robot.waitUntilFinished(500);
@@ -81,13 +83,13 @@ int main(int argc, char* argv[])
 
 	// NEEDLE PLACEMENT
 	bool log_movement = true;
-	bool move_interpolated = true;
+	bool move_interpolated = false;
 	//robot.moveToPosition(0.4,0.2,0.4);
 	//robot.needlePlacement(usPose, window_middle_rob, log_movement, move_interpolated);
 	//robot.needlePlacementTwo(usPose, window_points_rob, window_middle_rob, log_movement, move_interpolated);
-	robot.needlePlacementThree(usPose, window_points_rob, window_middle_rob, log_movement, move_interpolated);
+	robot.needlePlacementThree(tumor_position, window_points_rob, window_middle_rob, log_movement, move_interpolated);
 
-
+	 
 	system("Pause");
 
 	return 0;

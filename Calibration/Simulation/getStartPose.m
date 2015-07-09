@@ -26,7 +26,7 @@
     startPose = getHTM(robotSocket, robotInStream, robotOutStream );
 %     robPoses(:,:,robCount) = startPose;
 %     robCount = robCount + 1;
-    %startPose(1:3,4) = startPose(1:3,4)/1000;
+    startPose(1:3,4) = startPose(1:3,4)/1000;
     disp(startPose);
 
 %% Save joints to file

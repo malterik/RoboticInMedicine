@@ -70,6 +70,7 @@ void UR5::setPixelToProbeTransformation(matrix<double> pixel_to_probe_transforma
 bool UR5::setJoints(JointAngles angles) {
 	char commandString[100];
 
+	setSpeed(2);
 	sprintf(commandString, "MovePTPJoints %f %f %f %f %f %f ", angles[0] * (180 / PI), angles[1] * (180 / PI), angles[2] * (180 / PI), angles[3] * (180 / PI), angles[4] * (180 / PI), angles[5] * (180 / PI));
 	std::cout << commandString << std::endl;
 
@@ -624,7 +625,7 @@ vector<double> UR5::convertCamToRobPose(vector<double> camPosition)
 	camPose(2, 3) = camPosition(2);
 
 	// transform matrix
-	matrix<double> camPose_rob = convertCamToRobPose(camPose, true);
+	matrix<double> camPose_rob = convertCamToRobPose(camPose, false);
 
 	// reduce result to translation vector
 	vector<double> camPosition_rob(3);
@@ -874,11 +875,14 @@ bool UR5::needlePlacementThree(vector<double> target, std::vector<vector<double>
 			return false;
 		}
 	}
-
+	JointAngles test = getJoints("rad");
+	test.toString();
+	angles.toString();
 	// STEP 1: MOVE TO POSE OUTSIDE OF BOX
 	std::cout << "outside_pose_pre: " << pose_rob << std::endl;
-	success = moveAndWait(&UR5::moveLinear, pose_rob, pose_rob);
-	//success = moveAndWait(&UR5::setJoints, angles, pose_rob);
+	//success = moveAndWait(&UR5::moveLinear, pose_rob, pose_rob);
+	
+	success = moveAndWait(&UR5::moveLinear, angles, pose_rob);
 	if (!success)
 	{
 		return false;
@@ -902,6 +906,8 @@ bool UR5::needlePlacementThree(vector<double> target, std::vector<vector<double>
 	{
 		csvParser.writeHTM(final_pose, std::string(SIMULATION_OUTPUT_FOLDER) + "sim_final_matrix0.csv");
 	}
+
+
 
 	// STEP 3: MOVE OUTSIDE AGAIN
 	// use linear movement function provided by robot

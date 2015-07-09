@@ -9,10 +9,10 @@
     timeout = 3000; % timeout for tcp reads
     
     % Camera settings
-    camLocator = 'stylusRNM'; % locator name
+    camLocator = 'NeedleGRP4'; % locator name
 
     % Output settings
-    camHTMFile = 'Input\needleTipLocator2.csv'; % output file for robot joints
+    camHTMFile = 'Input\y.csv'; % output file for robot joints
 
 %% Initialization
     % Connect to CamBarServer, if necessary
@@ -28,11 +28,11 @@
     
 % get cam sample
     [camHTM, timestamp, isVisible, message] = getLocatorTransformMatrix(camSocket, camInStream, camOutStream, camLocator);
-    camHTM(1:3,4)=camHTM(1:3,4);
+    camHTM(1:3,4)=camHTM(1:3,4)/1000;
 %     camPoses(:,:,camCount) = camHTM;
 %     camCount = camCount + 1;
     disp(camHTM);
-    tumorPos = camHTM(1:3,4);
+%     pB = camHTM(1:3,4);
     
 %% Save files
      csvwrite(camHTMFile, tumorPos);

@@ -7,8 +7,8 @@ close all;
     % Input settings
 %     cam2MarkerFile = 'Calibration\Data\camHTMs.mat';
 %     base2EndeffectorFile = 'Calibration\Data\robHTMs.mat';
-        cam2MarkerFile = 'Calibration/Data/camHTMsComp.mat';
-    base2EndeffectorFile = 'Calibration/Data/robHTMsComp.mat';
+        cam2MarkerFile = 'Calibration/Data/camHTMs.mat';
+    base2EndeffectorFile = 'Calibration/Data/robHTMs.mat';
     
 
 
@@ -24,7 +24,6 @@ close all;
     Cam2Marker = camHTMs;
     Base2Endeffector = robHTMs;
     nMeasurements = size(Cam2Marker,3);
-    nMeasurements = 38;
     nCalibration = nMeasurements;
     nTest = nMeasurements - nCalibration;
 
@@ -47,7 +46,7 @@ close all;
     errorRotations = zeros(length(MCalib), 1); 
     skip = 5;
     for i = skip:length(MCalib);
-        [X,Y] = handEyeErnstTwo(MCalib(:,:,1:i), NCalib(:,:,1:i));
+        [X,Y] = handEyeErnstTwoOrth(MCalib(:,:,1:i), NCalib(:,:,1:i));
 
         errorTranslationsLocal = zeros(length(MCalib), 1);
         errorRotationsLocal = zeros(length(MCalib), 1);    
@@ -55,8 +54,8 @@ close all;
         % calculate mean error for current number of calibrations used
         for j=1:length(MCalib);
             err = inv(X)*inv(MCalib(:,:,j))*Y*NCalib(:,:,j);
-            [U,S,V] = svd(err(1:3,1:3));
-            err = [U*V' err(1:3,4); 0 0 0 1];
+%             [U,S,V] = svd(err(1:3,1:3));
+%             err = [U*V' err(1:3,4); 0 0 0 1];
             r = vrrotmat2vec(err(1:3,1:3));
             errorRotationsLocal(j) = abs(r(4))*180/pi;
             errorTranslationsLocal(j) = norm(err(1:3,4));
