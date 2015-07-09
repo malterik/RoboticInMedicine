@@ -22,6 +22,21 @@ IKResult* PathPlanner::chooseNearest(JointAngles currentAngles, IKResult configs
 	int temp = -1;
 	currentDist = 0;
 	for (int i = 0; i < configs.solutions.size(); i++) {
+		//check if the negative or positive angle is the nearest
+		//for (int j = 0; j < configs.solutions[i].size(); j++) {
+		//	
+		//	double originalAngle = configs.solutions[i][j];
+		//	double changedAngle = 2 * PI - abs(originalAngle);
+
+
+		//	std::cout << "Pathplanner: dist changedAngle " << abs(changedAngle - currentAngles[j]) << " dist origAngle " <<  abs(originalAngle - currentAngles[j]) << std::endl;;
+		//	if (abs(changedAngle - currentAngles[j]) < abs(originalAngle - currentAngles[j]) ) {
+		//		std::cout << "Pahtplanner changed the angle" << std::endl;
+		//		configs.solutions[i].setIndex(j,changedAngle);
+		//		
+		//	}
+		//}
+
 		currentDist = currentAngles - configs.solutions[i];
 		if (currentDist < minDist) {
 			minDist = currentDist;
